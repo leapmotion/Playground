@@ -64,27 +64,8 @@ public class GrabHand : MonoBehaviour {
                         (grabbed_.transform.position - palm_position_);
 
       Grabbable grabbable = grabbed_.GetComponent<Grabbable>();
-      if (grabbable != null) {
-        if (grabbable.preferredOrientation) {
-          Vector3 palm_orientation = grabbable.palmOrientation;
-          if (hand_model.GetLeapHand().IsLeft)
-            palm_orientation = Vector3.Scale(palm_orientation, new Vector3(-1, 1, 1));
-
-          Quaternion desired_rotation = 
-              Quaternion.FromToRotation(palm_rotation_ * palm_orientation,
-                                        grabbed_.transform.rotation * grabbable.objectOrientation);
-            
-          Vector3 from = start_rotation_ * Vector3.up;
-          Vector3 to = desired_rotation * Vector3.up;
-
-          if (Vector3.Dot(from, to) < 0)
-            start_rotation_ = Quaternion.FromToRotation(from, -to) * start_rotation_;
-          else
-            start_rotation_ = Quaternion.FromToRotation(from, to) * start_rotation_;
-        }
-
+      if (grabbable != null)
         grabbable.OnGrab();
-      }
     }
   }
 
@@ -153,6 +134,17 @@ public class GrabHand : MonoBehaviour {
       if (grabbable != null) {
         if (grabbable.keepDistanceWhenGrabbed)
           target_position = palm_position_ + palm_rotation_ * start_position_;
+
+        if (grabbable.preferredOrientation) {
+          Vector3 palm_orientation = grabbable.palmOrientation;
+          if (hand_model.GetLeapHand().IsLeft)
+            palm_orientation = Vector3.Scale(palm_orientation, new Vector3(-1, 1, 1));
+            
+          Vector3 from = grabbed_.transform.rotation * grabbable.objectOrientation;
+          Vector3 to = palm_rotation_ * palm_orientation;
+
+          target_rotation = Quaternion.FromToRotation(from, to) * grabbed_.transform.rotation;
+        }
       }
 
       Vector3 velocity = (target_position - grabbed_.transform.position) / Time.fixedDeltaTime;
