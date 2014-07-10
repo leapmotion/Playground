@@ -24,6 +24,8 @@ public class HandController : MonoBehaviour {
 
   public Vector3 handMovementScale = Vector3.one;
 
+  public bool destroyHands = true;
+
   private Controller leap_controller_;
 
   private Dictionary<int, HandModel> hand_graphics_;
@@ -102,7 +104,10 @@ public class HandController : MonoBehaviour {
 
     // Destroy all hands with defunct IDs.
     for (int i = 0; i < ids_to_check.Count; ++i) {
-      Destroy(all_hands[ids_to_check[i]].gameObject);
+      if (destroyHands)
+        Destroy(all_hands[ids_to_check[i]].gameObject);
+      else
+        all_hands[ids_to_check[i]].SetLeapHand(null);
       all_hands.Remove(ids_to_check[i]);
     }
   }

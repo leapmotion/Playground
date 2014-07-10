@@ -49,6 +49,9 @@ public class HandControllerEditor : Editor {
     controller.handMovementScale =
         EditorGUILayout.Vector3Field("Hand Movement Scale", controller.handMovementScale);
 
+    controller.destroyHands = EditorGUILayout.Toggle("Destroy Hands",
+                                                     controller.destroyHands);
+
     if (GUI.changed)
       EditorUtility.SetDirty(controller);
 

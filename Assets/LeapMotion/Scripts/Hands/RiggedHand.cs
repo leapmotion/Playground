@@ -18,6 +18,9 @@ public class RiggedHand : HandModel {
   }
 
   public override void UpdateHand() {
+    if (GetLeapHand() == null)
+      return;
+
     if (palm != null) {
       palm.position = GetPalmPosition();
       palm.rotation = GetPalmRotation();

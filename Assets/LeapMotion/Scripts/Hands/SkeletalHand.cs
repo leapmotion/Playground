@@ -24,7 +24,8 @@ public class SkeletalHand : HandModel {
   }
 
   public override void UpdateHand() {
-    SetPositions();
+    if (GetLeapHand() != null)
+      SetPositions();
   }
 
   protected Vector3 GetPalmCenter() {

@@ -55,7 +55,9 @@ public abstract class HandModel : MonoBehaviour {
     for (int i = 0; i < fingers.Length; ++i) {
       if (fingers[i] != null) {
         fingers[i].SetLeapHand(hand_);
-        fingers[i].SetOffset(GetPalmOffset());
+
+        if (hand_ != null)
+          fingers[i].SetOffset(GetPalmOffset());
       }
     }
   }
