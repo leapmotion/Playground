@@ -17,6 +17,7 @@ public class GrabHand : MonoBehaviour {
   public float grabDistance = 2.0f;
   public float filtering = 0.5f;
   public float minConfidence = 0.3f;
+  public float minActiveTime = 0.5f;
   public float maxVelocity = 0.3f;
 
   private bool pinching_;

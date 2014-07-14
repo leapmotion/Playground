@@ -86,6 +86,8 @@ public class HandController : MonoBehaviour {
           HandModel new_hand = CreateHand(model);
           new_hand.SetLeapHand(leap_hand);
           new_hand.SetController(this);
+          float scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
+          new_hand.transform.localScale = scale * transform.localScale;
           new_hand.InitHand();
           all_hands[leap_hand.Id] = new_hand;
         }

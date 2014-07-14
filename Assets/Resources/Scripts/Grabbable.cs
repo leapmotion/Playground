@@ -20,6 +20,11 @@ public class Grabbable : MonoBehaviour {
   public float breakForce;
   public float breakTorque;
 
+  void OnJointBreak(float break_force) {
+    for (int i = 0; i < ignoreOnGrab.Length; ++i)
+      ignoreOnGrab[i].gameObject.layer = LayerMask.NameToLayer("Broken");
+  }
+
   public void OnGrab(){
     for (int i = 0; i < ignoreOnGrab.Length; ++i)
       ignoreOnGrab[i].detectCollisions = false;

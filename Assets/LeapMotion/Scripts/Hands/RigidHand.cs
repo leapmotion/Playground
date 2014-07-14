@@ -33,8 +33,6 @@ public class RigidHand : SkeletalHand {
 
     if (palm != null) {
       // Set palm velocity.
-      if (Time.fixedDeltaTime == 0.0f)
-        Debug.Log("HAND ZERO TIME");
       Vector3 target_position = GetPalmCenter();
       palm.rigidbody.velocity = (target_position - palm.transform.position) *
                                 (1 - easing) / Time.fixedDeltaTime;

@@ -10,17 +10,17 @@ using Leap;
 
 public class FadeInOut : MonoBehaviour {
 
-  public float fadeInTime = 0.0f;
+  public float fadeInTime = 0.01f;
   
   private float alpha_ = 0.0f;
   private float last_time_;
 
   void Start() {
     last_time_ = Time.time;
-    Update();
+    FixedUpdate();
   }
 
-  void Update() {
+  void FixedUpdate() {
     float delta_time = Time.time - last_time_;
     last_time_ = Time.time;
 
@@ -38,7 +38,6 @@ public class FadeInOut : MonoBehaviour {
     }
 
     Renderer[] renderers = GetComponentsInChildren<Renderer>();
-
     for (int i = 0; i < renderers.Length; ++i) {
       Color main_color = renderers[i].material.color;
       main_color.a = alpha_ * alpha_;

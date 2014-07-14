@@ -14,14 +14,14 @@ public class SkeletalFinger : FingerModel {
   public Transform[] bones = new Transform[NUM_BONES];
 
   public override void InitFinger() {
-    SetPositions(GetController().transform);
+    SetPositions();
   }
 
   public override void UpdateFinger() {
-    SetPositions(GetController().transform);
+    SetPositions();
   }
 
-  private void SetPositions(Transform deviceTransform) {
+  private void SetPositions() {
     for (int i = 0; i < bones.Length; ++i) {
       if (bones[i] != null) {
         bones[i].transform.position = GetBoneCenter(i);

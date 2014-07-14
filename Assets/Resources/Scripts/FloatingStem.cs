@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿/******************************************************************************\
+* Copyright (C) Leap Motion, Inc. 2011-2014.                                   *
+* Leap Motion proprietary. Licensed under Apache 2.0                           *
+* Available at http://www.apache.org/licenses/LICENSE-2.0.html                 *
+\******************************************************************************/
+
+using UnityEngine;
 using System.Collections;
 
 public class FloatingStem : MonoBehaviour {
@@ -30,7 +36,7 @@ public class FloatingStem : MonoBehaviour {
     }
 
     rigidbody.drag = waterDrag;
-    rigidbody.drag = waterAngularDrag;
+    rigidbody.angularDrag = waterAngularDrag;
 
     float transition = Mathf.Clamp(-distanceFromSurface / transitionWidth, 0, 1);
     rigidbody.AddForce(new Vector3(0, waterForce * transition, 0));
