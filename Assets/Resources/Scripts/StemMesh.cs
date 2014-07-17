@@ -13,9 +13,10 @@ public class StemMesh : MonoBehaviour {
   const int VERTICES_PER_QUAD = 4;
 
   public Collider[] segments;
-  public int sides = 8;
+  public int sides = 6;
   public AnimationCurve stemCurve;
-  public float width = 0.5f;
+  public float growthRate = 1.0f;
+  public float growthProgress = 0.0f;
 
   private Vector3[] vertices_;
   private bool[] broken;
@@ -77,6 +78,17 @@ public class StemMesh : MonoBehaviour {
     mesh.triangles = triangles;
   }
 
+  protected void Separate(int index) {
+    for (int i = 0; i < index; ++i)
+      segments[i] = null;
+  }
+
+  private void Break(int index) {
+    for (int i = index; i < segments.Length; ++i) {
+      segments[i] = null;
+    }
+  }
+
   private void UpdateMesh() {
     for (int i = 0; i < segments.Length; ++i) {
       if (!broken[i] && segments[i].GetComponent<HingeJoint>() == null) {
@@ -85,12 +97,15 @@ public class StemMesh : MonoBehaviour {
       }
     }
 
+    growthProgress = Mathf.Clamp(growthProgress + Time.deltaTime * growthRate, 0.0f, 1.0f);
+
     int vertex_index = 0;
     float angle = 360.0f / sides;
 
     for (int i = 0; i < segments.Length; ++i) {
       float phase = (1.0f * i) / (segments.Length - 1);
-      Vector3 offset = new Vector3(stemCurve.Evaluate(phase), 0, 0);
+      float width = Mathf.Clamp((segments.Length - 1) * growthProgress - i, 0.0f, 1.0f);
+      Vector3 offset = new Vector3(width * stemCurve.Evaluate(phase), 0, 0);
 
       for (int side = 0; side < sides; ++side) {
         vertices_[vertex_index++] =

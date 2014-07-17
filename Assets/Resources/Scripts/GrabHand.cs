@@ -12,12 +12,12 @@ using Leap;
 // closest rigidbody with a spring force if it's within a given range.
 public class GrabHand : MonoBehaviour {
 
-  private const float TRIGGER_DISTANCE_RATIO = 0.6f;
+  private const float TRIGGER_DISTANCE_RATIO = 0.8f;
 
-  public float grabDistance = 2.0f;
+  public float grabDistance = 2.5f;
   public float filtering = 0.5f;
   public float minConfidence = 0.3f;
-  public float minActiveTime = 0.5f;
+  // public float minActiveTime = 0.5f;
   public float maxVelocity = 0.3f;
 
   private bool pinching_;

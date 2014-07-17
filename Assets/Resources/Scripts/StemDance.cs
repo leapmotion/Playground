@@ -24,6 +24,11 @@ public class StemDance : MonoBehaviour {
   private float dance_amount_ = 0.0f;
 
   void Update () {
+    for (int i = 0; i < segments.Length; ++i) {
+      if (segments[i] == null)
+        return;
+    }
+
     if (Input.GetKeyDown("d"))
       dancing_ = !dancing_;
 
@@ -45,11 +50,9 @@ public class StemDance : MonoBehaviour {
       float dance_amplitude = segmentDanceAmplitude.Evaluate(stem_position);
       float desired_bend = (minBend + (maxBend - minBend) * dance_curve) * dance_amplitude;
 
-      if (segments[i] != null) {
-        JointSpring spring = segments[i].spring;
-        spring.targetPosition = desired_bend;
-        segments[i].spring = spring;
-      }
+      JointSpring spring = segments[i].spring;
+      spring.targetPosition = desired_bend;
+      segments[i].spring = spring;
     }
   }
 }
