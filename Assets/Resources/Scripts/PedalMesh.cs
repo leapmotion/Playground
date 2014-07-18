@@ -55,7 +55,7 @@ public class PedalMesh : MonoBehaviour {
 
     for (int v = 0; v < numVertices / 2; ++v) {
       uv[2 * v] = new Vector2(0, (2.0f * v) / numVertices);
-      uv[2 * v + 1] = new Vector2(1.0f, (2.0f * v) / numVertices);
+      uv[2 * v + 1] = new Vector2(1, (2.0f * v) / numVertices);
     }
 
     for (int v = 0; v < (numVertices - 2) / 2; ++v) {

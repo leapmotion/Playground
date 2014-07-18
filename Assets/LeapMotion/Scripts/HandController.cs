@@ -24,8 +24,7 @@ public class HandController : MonoBehaviour {
 
   public Vector3 handMovementScale = Vector3.one;
 
-  public bool destroyHands = true;
-
+  public bool destroyHands;
   private Controller leap_controller_;
 
   private Dictionary<int, HandModel> hand_graphics_;
@@ -45,24 +44,33 @@ public class HandController : MonoBehaviour {
     }
   }
 
-  private void IgnoreCollisions(GameObject collider) {
-    // Ignores hand collisions with immovable objects.
-    Collider[] controller_colliders = gameObject.GetComponentsInChildren<Collider>();
-    Collider[] object_colliders = collider.GetComponentsInChildren<Collider>();
+  private void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
+    if (first == null || second == null)
+      return;
 
-    for (int i = 0; i < controller_colliders.Length; ++i) {
-      for (int h = 0; h < object_colliders.Length; ++h) {
-        if (controller_colliders[i].rigidbody == null)
-          Physics.IgnoreCollision(controller_colliders[i], object_colliders[h]);
-      }
+    Collider[] first_colliders = first.GetComponentsInChildren<Collider>();
+    Collider[] second_colliders = second.GetComponentsInChildren<Collider>();
+
+    for (int i = 0; i < first_colliders.Length; ++i) {
+      for (int j = 0; j < second_colliders.Length; ++j)
+        Physics.IgnoreCollision(first_colliders[i], second_colliders[j], ignore);
     }
+  }
+
+  private void IgnoreCollisionsWithChildren(GameObject to_ignore) {
+    IgnoreCollisions(gameObject, to_ignore);
+  }
+
+  public void IgnoreCollisionsWithHands(GameObject to_ignore, bool ignore = true) {
+    foreach (HandModel hand in hand_physics_.Values)
+      IgnoreCollisions(hand.gameObject, to_ignore, ignore);
   }
 
   private HandModel CreateHand(HandModel model) {
     HandModel hand_model = Instantiate(model, transform.position, transform.rotation)
                            as HandModel;
     hand_model.gameObject.SetActive(true);
-    IgnoreCollisions(hand_model.gameObject);
+    IgnoreCollisionsWithChildren(hand_model.gameObject);
     return hand_model;
   }
 
@@ -86,31 +94,36 @@ public class HandController : MonoBehaviour {
           HandModel new_hand = CreateHand(model);
           new_hand.SetLeapHand(leap_hand);
           new_hand.SetController(this);
-          float scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
-          new_hand.transform.localScale = scale * transform.localScale;
+
+          // Set scaling based on reference hand.
+          float hand_scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
+          new_hand.transform.localScale = hand_scale * transform.localScale;
+
           new_hand.InitHand();
+          new_hand.UpdateHand();
           all_hands[leap_hand.Id] = new_hand;
         }
+        else {
+          // Make sure we update the Leap Hand reference.
+          HandModel hand_model = all_hands[leap_hand.Id];
+          hand_model.SetLeapHand(leap_hand);
 
-        // Make sure we update the Leap Hand reference.
-        HandModel hand_model = all_hands[leap_hand.Id];
-        hand_model.SetLeapHand(leap_hand);
-
-        // Set scaling based on reference hand.
-        float hand_scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
-        hand_model.transform.localScale = hand_scale * transform.localScale;
-
-        hand_model.UpdateHand();
+          // Set scaling based on reference hand.
+          float hand_scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
+          hand_model.transform.localScale = hand_scale * transform.localScale;
+          hand_model.UpdateHand();
+        }
       }
     }
 
     // Destroy all hands with defunct IDs.
     for (int i = 0; i < ids_to_check.Count; ++i) {
-      if (destroyHands)
+      if (destroyHands) {
         Destroy(all_hands[ids_to_check[i]].gameObject);
+        all_hands.Remove(ids_to_check[i]);
+      }
       else
         all_hands[ids_to_check[i]].SetLeapHand(null);
-      all_hands.Remove(ids_to_check[i]);
     }
   }
 
@@ -118,7 +131,7 @@ public class HandController : MonoBehaviour {
     ToolModel tool_model = Instantiate(model, transform.position, transform.rotation)
                            as ToolModel;
     tool_model.gameObject.SetActive(true);
-    IgnoreCollisions(tool_model.gameObject);
+    IgnoreCollisionsWithChildren(tool_model.gameObject);
     return tool_model;
   }
 

@@ -12,19 +12,20 @@ using Leap;
 public class RiggedHand : HandModel {
 
   public Transform palm;
+  public Transform foreArm;
 
   public override void InitHand() {
     UpdateHand();
   }
 
   public override void UpdateHand() {
-    if (GetLeapHand() == null)
-      return;
-
     if (palm != null) {
       palm.position = GetPalmPosition();
       palm.rotation = GetPalmRotation();
     }
+
+    if (foreArm != null)
+      foreArm.rotation = GetArmRotation();
 
     for (int i = 0; i < fingers.Length; ++i) {
       if (fingers[i] != null)

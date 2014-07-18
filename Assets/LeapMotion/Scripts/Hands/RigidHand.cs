@@ -11,7 +11,7 @@ using Leap;
 // The model for our rigid hand made out of various polyhedra.
 public class RigidHand : SkeletalHand {
 
-  public float easing = 0.5f;
+  public float filtering = 0.5f;
 
   void Start() {
     palm.rigidbody.maxAngularVelocity = Mathf.Infinity;
@@ -19,11 +19,13 @@ public class RigidHand : SkeletalHand {
   }
 
   public override void InitHand() {
+    if (GetComponent<HandModel>().GetLeapHand() == null)
+      return;
     base.InitHand();
   }
 
   public override void UpdateHand() {
-    if (GetLeapHand() == null)
+    if (GetComponent<HandModel>().GetLeapHand() == null)
       return;
 
     for (int f = 0; f < fingers.Length; ++f) {
@@ -35,7 +37,7 @@ public class RigidHand : SkeletalHand {
       // Set palm velocity.
       Vector3 target_position = GetPalmCenter();
       palm.rigidbody.velocity = (target_position - palm.transform.position) *
-                                (1 - easing) / Time.fixedDeltaTime;
+                                (1 - filtering) / Time.deltaTime;
 
       // Set palm angular velocity.
       Quaternion target_rotation = GetPalmRotation();
@@ -50,7 +52,7 @@ public class RigidHand : SkeletalHand {
         axis = -axis;
       }
       if (angle != 0)
-        palm.rigidbody.angularVelocity = (1 - easing) * angle * axis;
+        palm.rigidbody.angularVelocity = (1 - filtering) * angle * axis;
     }
   }
 }

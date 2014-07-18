@@ -5,6 +5,33 @@ using System.Collections;
 [CustomEditor(typeof(HandController))]
 public class HandControllerEditor : Editor {
 
+  private const float BOX_HEIGHT = 0.45f;
+  private const float BOX_WIDTH = 0.965f;
+  private const float BOX_DEPTH = 0.6671f;
+
+  public void OnSceneGUI() {
+    HandController controller = (HandController)target;
+    Vector3 origin = controller.transform.TransformPoint(Vector3.zero);
+    Vector3 top_left =
+        controller.transform.TransformPoint(new Vector3(-BOX_WIDTH, BOX_HEIGHT, BOX_DEPTH));
+    Vector3 top_right =
+        controller.transform.TransformPoint(new Vector3(BOX_WIDTH, BOX_HEIGHT, BOX_DEPTH));
+    Vector3 bottom_left =
+        controller.transform.TransformPoint(new Vector3(-BOX_WIDTH, BOX_HEIGHT, -BOX_DEPTH));
+    Vector3 bottom_right =
+        controller.transform.TransformPoint(new Vector3(BOX_WIDTH, BOX_HEIGHT, -BOX_DEPTH));
+
+    Handles.DrawLine(origin, top_left);
+    Handles.DrawLine(origin, top_right);
+    Handles.DrawLine(origin, bottom_left);
+    Handles.DrawLine(origin, bottom_right);
+
+    Handles.DrawLine(bottom_left, top_left);
+    Handles.DrawLine(top_left, top_right);
+    Handles.DrawLine(top_right, bottom_right);
+    Handles.DrawLine(bottom_right, bottom_left);
+  }
+
   public override void OnInspectorGUI() {
     HandController controller = (HandController)target;
 
@@ -52,10 +79,10 @@ public class HandControllerEditor : Editor {
     controller.destroyHands = EditorGUILayout.Toggle("Destroy Hands",
                                                      controller.destroyHands);
 
+
     if (GUI.changed)
       EditorUtility.SetDirty(controller);
 
     Undo.RecordObject(controller, "Hand Preferences Changed: " + controller.name);
   }
 }
-

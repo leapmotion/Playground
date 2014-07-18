@@ -104,7 +104,7 @@ public class StemMesh : MonoBehaviour {
 
     for (int i = 0; i < segments.Length; ++i) {
       float phase = (1.0f * i) / (segments.Length - 1);
-      float width = Mathf.Clamp((segments.Length - 1) * growthProgress - i, 0.0f, 1.0f);
+      float width = Mathf.Clamp(segments.Length * growthProgress - i, 0.0f, 1.0f);
       Vector3 offset = new Vector3(width * stemCurve.Evaluate(phase), 0, 0);
 
       for (int side = 0; side < sides; ++side) {

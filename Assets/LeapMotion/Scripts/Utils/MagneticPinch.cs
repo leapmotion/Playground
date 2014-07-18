@@ -15,7 +15,6 @@ public class MagneticPinch : MonoBehaviour {
   private const float TRIGGER_DISTANCE_RATIO = 0.7f;
 
   public float forceSpringConstant = 100.0f;
-  public bool velocityForceMode = false;
   public float magnetDistance = 2.0f;
 
   private bool pinching_;
@@ -84,11 +83,7 @@ public class MagneticPinch : MonoBehaviour {
     // Accelerate what we are grabbing toward the pinch.
     if (grabbed_ != null) {
       Vector3 distance = pinch_position - grabbed_.transform.position;
-
-      if (velocityForceMode)
-        grabbed_.rigidbody.AddForce(forceSpringConstant * distance, ForceMode.VelocityChange);
-      else
-        grabbed_.rigidbody.AddForce(forceSpringConstant * distance);
+      grabbed_.rigidbody.AddForce(forceSpringConstant * distance);
     }
   }
 }

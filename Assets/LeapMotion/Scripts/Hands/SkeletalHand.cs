@@ -20,12 +20,15 @@ public class SkeletalHand : HandModel {
   }
 
   public override void InitHand() {
+    if (GetComponent<HandModel>().GetLeapHand() == null)
+      return;
     SetPositions();
   }
 
   public override void UpdateHand() {
-    if (GetLeapHand() != null)
-      SetPositions();
+    if (GetComponent<HandModel>().GetLeapHand() == null)
+      return;
+    SetPositions();
   }
 
   protected Vector3 GetPalmCenter() {
@@ -45,3 +48,5 @@ public class SkeletalHand : HandModel {
     }
   }
 }
+
+
