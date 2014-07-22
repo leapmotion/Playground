@@ -14,8 +14,9 @@ public class GrabHand : MonoBehaviour {
 
   private const float TRIGGER_DISTANCE_RATIO = 0.8f;
 
-  public float grabDistance = 2.5f;
-  public float filtering = 0.5f;
+  public float grabDistance = 2.0f;
+  public float rotationFiltering = 0.4f;
+  public float positionFiltering = 0.4f;
   public float minConfidence = 0.3f;
   // public float minActiveTime = 0.5f;
   public float maxVelocity = 0.3f;
@@ -23,9 +24,8 @@ public class GrabHand : MonoBehaviour {
   private bool pinching_;
   private Collider grabbed_;
   private Quaternion rotation_from_palm_;
-  private Vector3 start_position_;
 
-  private Vector3 palm_position_;
+  private Vector3 current_pinch_;
   private Quaternion palm_rotation_;
 
   void Start() {
@@ -59,10 +59,8 @@ public class GrabHand : MonoBehaviour {
       grabbed_.rigidbody.maxAngularVelocity = Mathf.Infinity;
       grabbed_.rigidbody.detectCollisions = false;
       palm_rotation_ = hand_model.GetPalmRotation();
-      palm_position_ = hand_model.GetPalmPosition();
       rotation_from_palm_ = Quaternion.Inverse(palm_rotation_) * grabbed_.transform.rotation;
-      start_position_ = Quaternion.Inverse(palm_rotation_) *
-                        (grabbed_.transform.position - palm_position_);
+      current_pinch_ = grabbed_.transform.position;
 
       Grabbable grabbable = grabbed_.GetComponent<Grabbable>();
       if (grabbable != null) {
@@ -139,19 +137,14 @@ public class GrabHand : MonoBehaviour {
 
     // Accelerate what we are grabbing toward the pinch.
     if (grabbed_ != null) {
-      Grabbable grabbable = grabbed_.GetComponent<Grabbable>();
       palm_rotation_ = Quaternion.Slerp(palm_rotation_, hand_model.GetPalmRotation(),
-                                        1.0f - filtering);
-      Vector3 delta_palm_position = hand_model.GetPalmPosition() - palm_position_;
-      palm_position_ += (1 - filtering) * delta_palm_position;
+                                        1.0f - rotationFiltering);
 
-      Vector3 target_position = pinch_position;
+      Vector3 delta_pinch = pinch_position - current_pinch_;
+      current_pinch_ = current_pinch_ + (1.0f - positionFiltering) * delta_pinch;
       Quaternion target_rotation = palm_rotation_ * rotation_from_palm_;
 
-      if (grabbable != null && grabbable.keepDistanceWhenGrabbed)
-        target_position = palm_position_ + palm_rotation_ * start_position_;
-
-      Vector3 velocity = (target_position - grabbed_.transform.position) / Time.fixedDeltaTime;
+      Vector3 velocity = (current_pinch_ - grabbed_.transform.position) / Time.fixedDeltaTime;
       grabbed_.rigidbody.velocity = velocity;
 
       Quaternion delta_rotation = target_rotation *
