@@ -34,7 +34,7 @@ public class ForceField : MonoBehaviour {
     int y = (int)(height * (local_position.y + 0.5f) + 1.0f);
 
     if (x >= 1 && x <= width && y >= 1 && y <= height)
-      positions_[x, y] = strength;
+      positions_[x, y] += strength;
   }
 
   void Start() {
@@ -80,8 +80,5 @@ public class ForceField : MonoBehaviour {
     }
     texture_.SetPixels(pixels_);
     texture_.Apply();
-
-    if (Input.GetKeyDown("a"))
-      positions_[20, 20] = 5.0f;
   }
 }

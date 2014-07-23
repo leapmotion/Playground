@@ -9,7 +9,6 @@ using System.Collections;
 
 public class Grabbable : MonoBehaviour {
 
-  public bool keepDistanceWhenGrabbed = false;
   public bool preferredOrientation = false;
   public Vector3 objectOrientation;
   public Vector3 palmOrientation;
