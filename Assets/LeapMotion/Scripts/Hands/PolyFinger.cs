@@ -41,27 +41,60 @@ public class PolyFinger : FingerModel {
     UpdateMesh();
     UpdateCapMesh();
     
-    float distance_from_device = 0;
+    Vector3 center_of_mass = Vector3.zero;
     int vertices_count = vertices_.Length;
     for (int i = 0; i < vertices_count; ++i) { 
-      distance_from_device += vertices_[i].magnitude;
+      center_of_mass += vertices_[i];
     }
-    distance_from_device /= vertices_count;
+    center_of_mass /= vertices_count;
     
+    float distance_from_device = center_of_mass.magnitude;
     float max_distance = 0.5f;
     float min_distance = 0.3f;
-    float m = - 1 / (max_distance - min_distance);
-    float c = - max_distance * m;
-    Debug.Log(distance_from_device);
+    float too_close_distance = 0.15f;
+    float alpha_distance = 1.0f;
     if (distance_from_device > min_distance) {
-      Color color = this.renderer.material.color;
-      color.a = m * distance_from_device + c;
-      this.renderer.material.color = color;
+      float m_distance = - 1 / (max_distance - min_distance);
+      float c_distance = - max_distance * m_distance;
+      alpha_distance = m_distance * distance_from_device + c_distance;
+    } else if (distance_from_device < too_close_distance) {
+      float m_distance = - 1 / too_close_distance;
+      float c_distance = - too_close_distance * m_distance;
+      alpha_distance = m_distance * distance_from_device + c_distance;
     } else {
-      Color color = this.renderer.material.color;
-      color.a = 1.0f;
-      this.renderer.material.color = color;
+      alpha_distance = 1.0f;
     }
+    if (alpha_distance < 0) { alpha_distance = 0; }
+    
+    float max_angle_width = 0.900f;
+    float min_angle_width = 0.600f;
+    float angle_width = Mathf.Atan(Mathf.Abs(center_of_mass.x) / center_of_mass.y);
+    float alpha_angle_width = 1.0f;
+    if (angle_width > min_angle_width) {
+      float m_angle_width = - 1 / (max_angle_width - min_angle_width);
+      float c_angle_width = - max_angle_width * m_angle_width;
+      alpha_angle_width = m_angle_width * angle_width + c_angle_width;
+    } else {
+      alpha_angle_width = 1.0f;
+    }
+    if (alpha_angle_width < 0) { alpha_angle_width = 0; }
+    
+    float max_angle_height = 0.700f;
+    float min_angle_height = 0.500f;
+    float angle_height = Mathf.Atan(Mathf.Abs(center_of_mass.z) / center_of_mass.y);
+    float alpha_angle_height = 1.0f;
+    if (angle_height > min_angle_height) {
+      float m_angle_height = - 1 / (max_angle_height - min_angle_height);
+      float c_angle_height = - max_angle_height * m_angle_height;
+      alpha_angle_height = m_angle_height * angle_height + c_angle_height;
+    } else {
+      alpha_angle_height = 1.0f;
+    }
+    if (alpha_angle_height < 0) { alpha_angle_height = 0; }
+    
+    Color color = this.renderer.material.color;
+    color.a = alpha_distance * alpha_angle_height * alpha_angle_width;
+    this.renderer.material.color = color;
   }
 
   void Update() {
