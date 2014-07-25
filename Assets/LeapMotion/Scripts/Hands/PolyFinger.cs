@@ -66,8 +66,8 @@ public class PolyFinger : FingerModel {
     }
     if (alpha_distance < 0) { alpha_distance = 0; }
     
-    float max_angle_width = 0.900f;
-    float min_angle_width = 0.600f;
+    float max_angle_width = 1.000f;
+    float min_angle_width = 0.800f;
     float angle_width = Mathf.Atan(Mathf.Abs(center_of_mass.x) / center_of_mass.y);
     float alpha_angle_width = 1.0f;
     if (angle_width > min_angle_width) {
@@ -79,8 +79,8 @@ public class PolyFinger : FingerModel {
     }
     if (alpha_angle_width < 0) { alpha_angle_width = 0; }
     
-    float max_angle_height = 0.700f;
-    float min_angle_height = 0.500f;
+    float max_angle_height = 0.900f;
+    float min_angle_height = 0.700f;
     float angle_height = Mathf.Atan(Mathf.Abs(center_of_mass.z) / center_of_mass.y);
     float alpha_angle_height = 1.0f;
     if (angle_height > min_angle_height) {
