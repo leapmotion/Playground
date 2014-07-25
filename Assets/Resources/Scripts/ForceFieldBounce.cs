@@ -9,13 +9,19 @@ using System.Collections;
 
 public class ForceFieldBounce : MonoBehaviour {
 
-  public float loudness = 5.0f;
+  public float fieldLoudness = 5.0f;
+  public float otherLoudness = 5.0f;
   public AudioClip bounceClip;
+  public AudioClip floorClip;
 
   void OnCollisionEnter(Collision collision) {
     if (collision.collider.GetComponent<ForceField>() != null) {
-      float strength = loudness * collision.relativeVelocity.magnitude;
-      audio.PlayOneShot(bounceClip, 1.0f - 1.0f / strength);
+      float strength = collision.relativeVelocity.magnitude;
+      audio.PlayOneShot(bounceClip, fieldLoudness - 1.0f / strength);
+    }
+    else {
+      float strength = collision.relativeVelocity.magnitude;
+      audio.PlayOneShot(floorClip, otherLoudness - 1.0f / strength);
     }
   }
 }

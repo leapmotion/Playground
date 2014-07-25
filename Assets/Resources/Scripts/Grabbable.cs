@@ -19,12 +19,19 @@ public class Grabbable : MonoBehaviour {
   public float breakForce;
   public float breakTorque;
 
+  private bool grabbed_ = false;
+
+  public bool IsGrabbed() {
+    return grabbed_;
+  }
+
   void OnJointBreak(float break_force) {
     for (int i = 0; i < ignoreOnGrab.Length; ++i)
       ignoreOnGrab[i].gameObject.layer = LayerMask.NameToLayer("Broken");
   }
 
   public void OnGrab(){
+    grabbed_ = true;
     for (int i = 0; i < ignoreOnGrab.Length; ++i)
       ignoreOnGrab[i].detectCollisions = false;
 
@@ -35,6 +42,7 @@ public class Grabbable : MonoBehaviour {
   }
 
   public void OnRelease(){
+    grabbed_ = false;
     for (int i = 0; i < ignoreOnGrab.Length; ++i)
       ignoreOnGrab[i].detectCollisions = true;
 
