@@ -40,6 +40,28 @@ public class PolyFinger : FingerModel {
   public override void UpdateFinger() {
     UpdateMesh();
     UpdateCapMesh();
+    
+    float distance_from_device = 0;
+    int vertices_count = vertices_.Length;
+    for (int i = 0; i < vertices_count; ++i) { 
+      distance_from_device += vertices_[i].magnitude;
+    }
+    distance_from_device /= vertices_count;
+    
+    float max_distance = 0.5f;
+    float min_distance = 0.3f;
+    float m = - 1 / (max_distance - min_distance);
+    float c = - max_distance * m;
+    Debug.Log(distance_from_device);
+    if (distance_from_device > min_distance) {
+      Color color = this.renderer.material.color;
+      color.a = m * distance_from_device + c;
+      this.renderer.material.color = color;
+    } else {
+      Color color = this.renderer.material.color;
+      color.a = 1.0f;
+      this.renderer.material.color = color;
+    }
   }
 
   void Update() {
