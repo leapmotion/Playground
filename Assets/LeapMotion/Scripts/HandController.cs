@@ -30,6 +30,8 @@ public class HandController : MonoBehaviour {
   private Dictionary<int, HandModel> hand_graphics_;
   private Dictionary<int, HandModel> hand_physics_;
   private Dictionary<int, ToolModel> tools_;
+  
+  private ParticleSystem particle_system_;
 
   void Start() {
     leap_controller_ = new Controller();
@@ -38,6 +40,8 @@ public class HandController : MonoBehaviour {
 
     tools_ = new Dictionary<int, ToolModel>();
 
+    particle_system_ = (ParticleSystem)(GameObject.Find("Particles").GetComponent(typeof(ParticleSystem)));
+    
     if (leap_controller_ == null) {
       Debug.LogWarning(
           "Cannot connect to controller. Make sure you have Leap Motion v2.0+ installed");
@@ -181,7 +185,18 @@ public class HandController : MonoBehaviour {
       return;
 
     Frame frame = leap_controller_.Frame();
+    ParticleSystem.Particle[] particles = new ParticleSystem.Particle[particle_system_.particleCount];
+    particle_system_.GetParticles(particles);
     UpdateHandModels(hand_graphics_, frame.Hands, leftGraphicsModel, rightGraphicsModel);
+    for (int i = 0; i < frame.Hands.Count; ++i) {
+      Vector3 attraction = frame.Hands[i].PalmPosition.ToUnityScaled()*10;
+      //Debug.Log(attraction);
+      for (int j = 0; j < particles.Length; ++j) {
+        //particles[j].position = (attraction + particles[j].position)/10;
+        particles[j].position = attraction;
+      }
+    }
+    particle_system_.SetParticles(particles, particles.Length);
   }
 
   void FixedUpdate() {
