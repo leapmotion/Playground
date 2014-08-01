@@ -159,7 +159,7 @@
 			// velocity at y 
 			float2 vy = tex2Dlod(_VelTex, float4(yf,0,0)).xy;
 
-			float zy = SAMPLE_DEPTH_TEXTURE_LOD(_CameraDepthTexture, float4(y,0,0))); 
+			float zy = SAMPLE_DEPTH_TEXTURE_LOD(_CameraDepthTexture, float4(y,0,0));
 			zy = -Linear01Depth(zy);
 			float f = softDepthCompare(zx, zy);
 			float b = softDepthCompare(zy, zx);

@@ -93,7 +93,7 @@ public class PolyFinger : FingerModel {
     if (alpha_angle_height < 0) { alpha_angle_height = 0; }
     
     Color color = this.renderer.material.color;
-    color.a = alpha_distance * alpha_angle_height * alpha_angle_width;
+    //color.a = alpha_distance * alpha_angle_height * alpha_angle_width;
     this.renderer.material.color = color;
   }
 
