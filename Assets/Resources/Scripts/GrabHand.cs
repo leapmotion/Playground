@@ -23,6 +23,9 @@ public class GrabHand : MonoBehaviour {
   public float minConfidence = 0.3f;
   public float maxVelocity = 0.3f;
 
+  public Vector3 maxMovement = new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
+  public Vector3 minMovement = new Vector3(-Mathf.Infinity, -Mathf.Infinity, -Mathf.Infinity);
+
   private float last_max_angular_velocity_;
   private bool pinching_;
   private bool releasing_;
@@ -124,7 +127,7 @@ public class GrabHand : MonoBehaviour {
     grabbed_ = null;
   }
 
-  void Update() {
+  void FixedUpdate() {
     bool trigger_pinch = false;
     bool trigger_release = true;
     HandModel hand_model = GetComponent<HandModel>();
@@ -183,10 +186,15 @@ public class GrabHand : MonoBehaviour {
       Quaternion target_rotation = palm_rotation_ * rotation_from_palm_;
 
       if (releasing_) {
-        float spring_amount = RELEASE_MAXIMUM_SPRING * (1.0f - release_distance_);
-        Vector3 velocity = (current_pinch_ - grabbed_.transform.position) / Time.fixedDeltaTime;
-        grabbed_.rigidbody.velocity += spring_amount * (velocity - grabbed_.rigidbody.velocity);
-        grabbed_.rigidbody.velocity *= (1 - RELEASE_DAMPING);
+        float gravity_amount = RELEASE_MAXIMUM_SPRING * (1.0f - release_distance_);
+        Vector3 delta_position = current_pinch_ - grabbed_.transform.position;
+        if (delta_position.magnitude > 0.3f) {
+          OnRelease();
+          return;
+        }
+        float force = 20 * gravity_amount / (0.04f + delta_position.magnitude * delta_position.magnitude);
+        grabbed_.rigidbody.AddForce(delta_position.normalized * force);
+        grabbed_.rigidbody.velocity *= 0.9f;
 
         Quaternion delta_rotation = target_rotation *
                                     Quaternion.Inverse(grabbed_.transform.rotation);
@@ -200,10 +208,14 @@ public class GrabHand : MonoBehaviour {
           axis = -axis;
         }
         if (angle != 0)
-          grabbed_.rigidbody.angularVelocity = spring_amount * angle * axis;
+          grabbed_.rigidbody.angularVelocity = gravity_amount * angle * axis;
       }
       else {
-        Vector3 velocity = (current_pinch_ - grabbed_.transform.position) / Time.fixedDeltaTime;
+        Vector3 clamped_pinch = current_pinch_;
+        clamped_pinch.x = Mathf.Clamp(clamped_pinch.x, minMovement.x, maxMovement.x);
+        clamped_pinch.y = Mathf.Clamp(clamped_pinch.y, minMovement.y, maxMovement.y);
+        clamped_pinch.z = Mathf.Clamp(clamped_pinch.z, minMovement.z, maxMovement.z);
+        Vector3 velocity = (clamped_pinch - grabbed_.transform.position) / Time.deltaTime;
         grabbed_.rigidbody.velocity = velocity;
 
         Quaternion delta_rotation = target_rotation *

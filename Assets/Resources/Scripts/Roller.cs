@@ -8,7 +8,7 @@ public class Roller : MonoBehaviour {
   public float angleForceScale = 40.0f;
   public float angularVelocityForceScale = 40.0f;
   public float velocityForceScale = 3.0f;
-  public float maxAngularVelocity = 40.0f;
+  public float maxAngularVelocity = 20.0f;
 
 	void Start () {
     rigidbody.maxAngularVelocity = maxAngularVelocity;

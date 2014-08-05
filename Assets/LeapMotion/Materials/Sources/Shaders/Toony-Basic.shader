@@ -7,10 +7,12 @@ Shader "Toon/Basic" {
 
 
 	SubShader {
-		Tags { "RenderType"="Opaque" }
+    Tags { "RenderType"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+	
 		Pass {
 			Name "BASE"
 			Cull Off
+      Blend SrcAlpha OneMinusSrcAlpha
 			
 			CGPROGRAM
 			#pragma vertex vert

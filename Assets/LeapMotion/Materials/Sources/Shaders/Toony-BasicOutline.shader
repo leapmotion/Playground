@@ -6,7 +6,7 @@ Shader "Toon/Basic Outline" {
 		_MainTex ("Base (RGB)", 2D) = "white" { }
 		_ToonShade ("ToonShader Cubemap(RGB)", CUBE) = "" { Texgen CubeNormal }
 	}
-	
+
 	CGINCLUDE
 	#include "UnityCG.cginc"
 	
