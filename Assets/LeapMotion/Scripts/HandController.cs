@@ -31,16 +31,17 @@ public class HandController : MonoBehaviour {
   private Dictionary<int, HandModel> hand_physics_;
   private Dictionary<int, ToolModel> tools_;
   
-  private ParticleSystem particle_system_;
+  private List<byte[]> list_of_frames_;
+  private int frameIdx = 0;
+  private bool is_recording_ = false;
 
   void Start() {
     leap_controller_ = new Controller();
     hand_graphics_ = new Dictionary<int, HandModel>();
     hand_physics_ = new Dictionary<int, HandModel>();
+    list_of_frames_ = new List<byte[]>();
 
     tools_ = new Dictionary<int, ToolModel>();
-
-    particle_system_ = (ParticleSystem)(GameObject.Find("Particles").GetComponent(typeof(ParticleSystem)));
     
     if (leap_controller_ == null) {
       Debug.LogWarning(
@@ -183,28 +184,43 @@ public class HandController : MonoBehaviour {
   void Update() {
     if (leap_controller_ == null)
       return;
-
-    Frame frame = leap_controller_.Frame();
-    ParticleSystem.Particle[] particles = new ParticleSystem.Particle[particle_system_.particleCount];
-    particle_system_.GetParticles(particles);
-    UpdateHandModels(hand_graphics_, frame.Hands, leftGraphicsModel, rightGraphicsModel);
-    for (int i = 0; i < frame.Hands.Count; ++i) {
-      Vector3 attraction = frame.Hands[i].PalmPosition.ToUnityScaled()*10;
-      //Debug.Log(attraction);
-      for (int j = 0; j < particles.Length; ++j) {
-        //particles[j].position = (attraction + particles[j].position)/10;
-        particles[j].position = attraction;
-      }
+     
+    Frame frame = new Frame();
+    if (Input.GetKey(KeyCode.R) && !is_recording_) {
+      Debug.Log("Record");
+      list_of_frames_.Clear();
+      is_recording_ = true;
+    } else if (Input.GetKey(KeyCode.E) && is_recording_) {
+      Debug.Log("End");
+      frameIdx = 0;
+      is_recording_ = false;
     }
-    particle_system_.SetParticles(particles, particles.Length);
+    
+    if (is_recording_) {
+      frame = leap_controller_.Frame();
+      list_of_frames_.Add(frame.Serialize);
+    } else if (!is_recording_ && (list_of_frames_.Count > 0)){
+      frame.Deserialize(list_of_frames_[frameIdx]);
+      frameIdx++;
+      if (frameIdx == list_of_frames_.Count) {
+        frameIdx = 0;
+        //list_of_frames_.Clear();
+      }
+    } else {
+      frame = leap_controller_.Frame();
+    }
+      
+    UpdateHandModels(hand_graphics_, frame.Hands, leftGraphicsModel, rightGraphicsModel);
   }
 
   void FixedUpdate() {
     if (leap_controller_ == null)
       return;
-
+     
     Frame frame = leap_controller_.Frame();
+
     UpdateHandModels(hand_physics_, frame.Hands, leftPhysicsModel, rightPhysicsModel);
     UpdateToolModels(tools_, frame.Tools, toolModel);
   }
 }
+

@@ -1,0 +1,27 @@
+Initialize engine version: 4.5.2f1 (9abb1b59b47c)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 9.0c [nvd3dum.dll 9.18.13.3221]
+    Renderer: NVIDIA Quadro 600
+    Vendor:   NVIDIA
+    VRAM:     946 MB (via DXGI)
+    Caps:     Shader=30 DepthRT=1 NativeDepth=1 NativeShadow=1 DF16=0 INTZ=1 RAWZ=0 NULL=1 RESZ=0 SlowINTZ=0
+Begin MonoManager ReloadAssembly
+Platform assembly: E:\apps\NightFlower\Introduction_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading E:\apps\NightFlower\Introduction_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: E:\apps\NightFlower\Introduction_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading E:\apps\NightFlower\Introduction_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: E:\apps\NightFlower\Introduction_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading E:\apps\NightFlower\Introduction_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: E:\apps\NightFlower\Introduction_Data\Managed\Assembly-UnityScript-firstpass.dll (this message is harmless)
+Loading E:\apps\NightFlower\Introduction_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
+Platform assembly: E:\apps\NightFlower\Introduction_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
+Loading E:\apps\NightFlower\Introduction_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
+Platform assembly: E:\apps\NightFlower\Introduction_Data\Managed\LeapCSharp.NET3.5.dll (this message is harmless)
+Loading E:\apps\NightFlower\Introduction_Data\Managed\LeapCSharp.NET3.5.dll into Unity Child Domain
+- Completed reload, in  0.069 seconds
+desktop: 2560x1440 59Hz; virtual: 3760x1920 at 0,-480
+<RI> Initializing input.
+XInput1_3.dll not found.
+<RI> Input initialized.
+Platform assembly: E:\apps\NightFlower\Introduction_Data\Managed\Boo.Lang.dll (this message is harmless)
