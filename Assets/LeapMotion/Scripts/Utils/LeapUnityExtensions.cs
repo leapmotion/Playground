@@ -19,13 +19,19 @@ namespace Leap {
     public static readonly Vector3 Z_FLIP = new Vector3(1, 1, -1);
 
     // For directions.
-    public static Vector3 ToUnity(this Vector leap_vector) {
-      return FlipZ(ToVector3(leap_vector));
+    public static Vector3 ToUnity(this Vector leap_vector, bool flip_z = true) {
+      if (flip_z)
+        return FlipZ(ToVector3(leap_vector));
+
+      return ToVector3(leap_vector);
     }
 
     // For positions and scaled vectors.
-    public static Vector3 ToUnityScaled(this Vector leap_vector) {
-      return INPUT_SCALE * FlipZ(ToVector3(leap_vector));
+    public static Vector3 ToUnityScaled(this Vector leap_vector, bool flip_z = true) {
+      if (flip_z)
+        return INPUT_SCALE * FlipZ(ToVector3(leap_vector));
+
+      return INPUT_SCALE * ToVector3(leap_vector);
     }
 
     private static Vector3 FlipZ(Vector3 vector) {
@@ -44,14 +50,14 @@ namespace Leap {
     public static readonly Vector LEAP_FORWARD = new Vector(0, 0, -1);
     public static readonly Vector LEAP_ORIGIN = new Vector(0, 0, 0);
 
-    public static Quaternion Rotation(this Matrix matrix) {
-      Vector3 up = matrix.TransformDirection(LEAP_UP).ToUnity();
-      Vector3 forward = matrix.TransformDirection(LEAP_FORWARD).ToUnity();
+    public static Quaternion Rotation(this Matrix matrix, bool flip_z = true) {
+      Vector3 up = matrix.TransformDirection(LEAP_UP).ToUnity(flip_z);
+      Vector3 forward = matrix.TransformDirection(LEAP_FORWARD).ToUnity(flip_z);
       return Quaternion.LookRotation(forward, up);
     }
 
-    public static Vector3 Translation(this Matrix matrix) {
-      return matrix.TransformPoint(LEAP_ORIGIN).ToUnityScaled();
+    public static Vector3 Translation(this Matrix matrix, bool flip_z = true) {
+      return matrix.TransformPoint(LEAP_ORIGIN).ToUnityScaled(flip_z);
     }
   }
 }

@@ -18,10 +18,9 @@ public class RobotBody : MonoBehaviour {
   public float attachRadius = 0.3f;
   public float breakForce = 10.0f;
   public float breakTorque = 10.0f;
+  public HingeJoint[] armJoints;
 
-  public Rigidbody feet;
-  public Rigidbody leftArm;
-  public Rigidbody rightArm;
+  public Roller feet;
 
   private float lightning_noise_phase_ = 0.0f;
   private RobotHead robot_head_;

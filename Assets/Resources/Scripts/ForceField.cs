@@ -59,7 +59,7 @@ public class ForceField : MonoBehaviour {
     pixels_ = new Color[width * height];
 
     for (int i = 0; i < width * height; ++i)
-      pixels_[i] = new Color(0, 0, 0);
+      pixels_[i] = new Color(1, 1, 1);
 
     texture_ = new Texture2D(width, height);
     texture_.filterMode = FilterMode.Point;
