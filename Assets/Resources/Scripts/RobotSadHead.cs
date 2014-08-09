@@ -29,6 +29,7 @@ public class RobotSadHead : RobotHead {
     cloud.Stop();
     rain.Stop();
     SetFaceAlpha(0.0f);
+    dance_moves_ = 0;
     if (GetBody() != null) {
       foreach (HingeJoint arm_joint in GetBody().armJoints) {
         arm_joint.useSpring = false;

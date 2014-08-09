@@ -59,6 +59,64 @@ public class RobotBody : MonoBehaviour {
     lightning_noise_phase_ += Time.deltaTime * lightningChangeFrequency;
   }
 
+  void DisconnectHead() {
+    if (robot_head_ != null) {
+      robot_head_.ShutDown();
+      robot_head_.SetBody(null);
+      robot_head_ = null;
+    }
+  }
+
+  void AttachHead(Collider new_head) {
+    SpringJoint spring = GetComponent<SpringJoint>();
+    RemoveLine();        
+    if (spring != null)
+      Destroy(spring);
+    
+    Vector3[] faces = {new_head.transform.up, -new_head.transform.up,
+                       new_head.transform.right, -new_head.transform.right,
+                       new_head.transform.forward, -new_head.transform.forward};
+
+    float greatest_dot = 0.0f;
+    Vector3 attach_face = Vector3.zero;
+    for (int i = 0; i < faces.Length; ++i) {
+      float dot = Vector3.Dot(-transform.up, faces[i]);
+      if (dot > greatest_dot) {
+        attach_face = faces[i];
+        greatest_dot = dot;
+      }
+    }
+
+    new_head.transform.rotation = Quaternion.FromToRotation(attach_face, -transform.up) *
+                                  new_head.transform.rotation;
+
+    greatest_dot = 0.0f;
+    Vector3 robot_face_vector = Vector3.zero;
+    for (int i = 0; i < faces.Length; ++i) {
+      float dot = Vector3.Dot(transform.forward, faces[i]);
+      if (dot > greatest_dot) {
+        robot_face_vector = faces[i];
+        greatest_dot = dot;
+      }
+    }
+
+    FixedJoint head_joint = gameObject.AddComponent<FixedJoint>();
+    head_joint.connectedBody = new_head.rigidbody;
+    head_joint.anchor = headCenterOffset;
+    head_joint.autoConfigureConnectedAnchor = false;
+    head_joint.connectedAnchor = Vector3.zero;
+    head_joint.breakForce = breakForce;
+    head_joint.breakTorque = breakTorque;
+
+    if (robot_head_ != new_head.GetComponent<RobotHead>()) {
+      robot_head_ = new_head.GetComponent<RobotHead>();        
+      robot_head_.SetBody(this);
+      robot_head_.SetOrientation(transform.up, robot_face_vector);
+      robot_head_.BootUp();
+    }
+
+  }
+
   void LookForHead() {
     Vector3 neck_position = transform.TransformPoint(headAttachmentOffset);
     Vector3 head_center_position = transform.TransformPoint(headCenterOffset);
@@ -80,62 +138,20 @@ public class RobotBody : MonoBehaviour {
     }
 
     SpringJoint spring = GetComponent<SpringJoint>();
-    if (closest_head != null) {
-      
+    if (closest_head == null) {
+      DisconnectHead();
+      RemoveLine();
+      if (spring != null)
+        Destroy(spring);
+    }
+    else {
+      if (closest_head.GetComponent<RobotHead>() != robot_head_)
+        DisconnectHead();
+
       if ((head_center_position - closest_head.transform.position).magnitude < attachRadius) {
-        RemoveLine();        
-        if (spring != null)
-          Destroy(spring);
-        
-        Vector3[] faces = {closest_head.transform.up, -closest_head.transform.up,
-                           closest_head.transform.right, -closest_head.transform.right,
-                           closest_head.transform.forward, -closest_head.transform.forward};
-
-        float greatest_dot = 0.0f;
-        Vector3 attach_face = Vector3.zero;
-        for (int i = 0; i < faces.Length; ++i) {
-          float dot = Vector3.Dot(-transform.up, faces[i]);
-          if (dot > greatest_dot) {
-            attach_face = faces[i];
-            greatest_dot = dot;
-          }
-        }
-
-        closest_head.transform.rotation = Quaternion.FromToRotation(attach_face, -transform.up) *
-                                          closest_head.transform.rotation;
-
-        greatest_dot = 0.0f;
-        Vector3 robot_face_vector = Vector3.zero;
-        for (int i = 0; i < faces.Length; ++i) {
-          float dot = Vector3.Dot(transform.forward, faces[i]);
-          if (dot > greatest_dot) {
-            robot_face_vector = faces[i];
-            greatest_dot = dot;
-          }
-        }
-
-        FixedJoint head_joint = gameObject.AddComponent<FixedJoint>();
-        head_joint.connectedBody = closest_head.rigidbody;
-        head_joint.anchor = headCenterOffset;
-        head_joint.autoConfigureConnectedAnchor = false;
-        head_joint.connectedAnchor = Vector3.zero;
-        head_joint.breakForce = breakForce;
-        head_joint.breakTorque = breakTorque;
-
-        if (robot_head_ != closest_head.GetComponent<RobotHead>()) {
-          robot_head_ = closest_head.GetComponent<RobotHead>();        
-          robot_head_.SetBody(this);
-          robot_head_.SetOrientation(transform.up, robot_face_vector);
-          robot_head_.BootUp();
-        }
+        AttachHead(closest_head);
       }
       else {
-        if (robot_head_ != null && closest_head != robot_head_) {
-          robot_head_.ShutDown();
-          robot_head_.SetBody(null);
-          robot_head_ = null;
-        }
-
         DrawLine(neck_position, closest_head.transform.position);
         if (spring == null)
           spring = gameObject.AddComponent<SpringJoint>();
@@ -149,11 +165,6 @@ public class RobotBody : MonoBehaviour {
         spring.autoConfigureConnectedAnchor = false;
         spring.connectedAnchor = Vector3.zero;
       }
-    }
-    else {
-      RemoveLine();
-      if (spring != null)
-        Destroy(spring);
     }
   }
 
