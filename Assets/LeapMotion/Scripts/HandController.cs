@@ -31,15 +31,13 @@ public class HandController : MonoBehaviour {
   private Dictionary<int, HandModel> hand_physics_;
   private Dictionary<int, ToolModel> tools_;
   
-  private List<byte[]> list_of_frames_;
-  private int frameIdx = 0;
-  private bool is_recording_ = false;
+  private bool playback_ = false;
+  private int playback_index_ = 0;
 
   void Start() {
     leap_controller_ = new Controller();
     hand_graphics_ = new Dictionary<int, HandModel>();
     hand_physics_ = new Dictionary<int, HandModel>();
-    list_of_frames_ = new List<byte[]>();
 
     tools_ = new Dictionary<int, ToolModel>();
     
@@ -184,30 +182,32 @@ public class HandController : MonoBehaviour {
   void Update() {
     if (leap_controller_ == null)
       return;
-     
-    Frame frame = new Frame();
-    if (Input.GetKey(KeyCode.R) && !is_recording_) {
+   
+    Frame frame = leap_controller_.Frame();
+    
+    LeapRecorder leap_recorder = (LeapRecorder)GameObject.Find("LeapRecorder").GetComponent(typeof(LeapRecorder));
+    if (Input.GetKey(KeyCode.R)) {
       Debug.Log("Record");
-      list_of_frames_.Clear();
-      is_recording_ = true;
-    } else if (Input.GetKey(KeyCode.E) && is_recording_) {
+      leap_recorder.Record();
+      playback_index_ = 0;
+    } else if (Input.GetKey(KeyCode.E)) {
       Debug.Log("End");
-      frameIdx = 0;
-      is_recording_ = false;
+      leap_recorder.EndRecord();
+      playback_ = true;
+    } else if (Input.GetKey(KeyCode.S)) {
+      Debug.Log("Save");
+      leap_recorder.Save();
+    } else if (Input.GetKey(KeyCode.Space)) {
+      leap_recorder.EndRecord();
+      playback_ = false;
     }
     
-    if (is_recording_) {
-      frame = leap_controller_.Frame();
-      list_of_frames_.Add(frame.Serialize);
-    } else if (!is_recording_ && (list_of_frames_.Count > 0)){
-      frame.Deserialize(list_of_frames_[frameIdx]);
-      frameIdx++;
-      if (frameIdx == list_of_frames_.Count) {
-        frameIdx = 0;
-        //list_of_frames_.Clear();
+    if (playback_) {
+      frame = leap_recorder.GetFrame(playback_index_);
+      playback_index_++;
+      if (playback_index_ == leap_recorder.GetNumFrames()) {
+        playback_index_ = 0;
       }
-    } else {
-      frame = leap_controller_.Frame();
     }
       
     UpdateHandModels(hand_graphics_, frame.Hands, leftGraphicsModel, rightGraphicsModel);
