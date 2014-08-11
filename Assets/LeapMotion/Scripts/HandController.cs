@@ -30,9 +30,6 @@ public class HandController : MonoBehaviour {
   private Dictionary<int, HandModel> hand_graphics_;
   private Dictionary<int, HandModel> hand_physics_;
   private Dictionary<int, ToolModel> tools_;
-  
-  private bool playback_ = false;
-  private int playback_index_ = 0;
 
   void Start() {
     leap_controller_ = new Controller();
@@ -184,32 +181,6 @@ public class HandController : MonoBehaviour {
       return;
    
     Frame frame = leap_controller_.Frame();
-    
-    LeapRecorder leap_recorder = (LeapRecorder)GameObject.Find("LeapRecorder").GetComponent(typeof(LeapRecorder));
-    if (Input.GetKey(KeyCode.R)) {
-      Debug.Log("Record");
-      leap_recorder.Record();
-      playback_index_ = 0;
-    } else if (Input.GetKey(KeyCode.E)) {
-      Debug.Log("End");
-      leap_recorder.EndRecord();
-      playback_ = true;
-    } else if (Input.GetKey(KeyCode.S)) {
-      Debug.Log("Save");
-      leap_recorder.Save();
-    } else if (Input.GetKey(KeyCode.Space)) {
-      leap_recorder.EndRecord();
-      playback_ = false;
-    }
-    
-    if (playback_) {
-      frame = leap_recorder.GetFrame(playback_index_);
-      playback_index_++;
-      if (playback_index_ == leap_recorder.GetNumFrames()) {
-        playback_index_ = 0;
-      }
-    }
-      
     UpdateHandModels(hand_graphics_, frame.Hands, leftGraphicsModel, rightGraphicsModel);
   }
 
