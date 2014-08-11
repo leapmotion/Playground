@@ -17,6 +17,7 @@ public class RobotLoveyHead : RobotHead {
 
   private float active_time_ = 0;
 
+  public float spinTorqueScale = 1.0f;
   public AnimationCurve spinTorqueCurve;
   public float spinFrequency = 1.0f;
 
@@ -87,7 +88,7 @@ public class RobotLoveyHead : RobotHead {
 
     if (GetBody().feet.IsUpright()) {
       float spins = active_time_ * spinFrequency;
-      float spin_torque = spinTorqueCurve.Evaluate(spins - (int)spins);
+      float spin_torque = spinTorqueScale * spinTorqueCurve.Evaluate(spins - (int)spins);
       rigidbody.AddTorque(spin_torque * GetBody().transform.up);
     }
 
