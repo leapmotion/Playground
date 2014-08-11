@@ -8,7 +8,6 @@ public class LeapRecorder : MonoBehaviour {
   private Controller leap_controller_;
 
   private List<byte[]> list_of_frames_;
-  private int frameIdx = 0;
   private bool is_recording_ = false;
   
 	// Use this for initialization

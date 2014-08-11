@@ -5,21 +5,17 @@ using System.Collections;
 [CustomEditor(typeof(HandController))]
 public class HandControllerEditor : Editor {
 
-  private const float BOX_HEIGHT = 0.45f;
+  private const float INTERACTION_RADIUS = 0.45f;
   private const float BOX_WIDTH = 0.965f;
   private const float BOX_DEPTH = 0.6671f;
 
   public void OnSceneGUI() {
     HandController controller = (HandController)target;
     Vector3 origin = controller.transform.TransformPoint(Vector3.zero);
-    Vector3 top_left =
-        controller.transform.TransformPoint(new Vector3(-BOX_WIDTH, BOX_HEIGHT, BOX_DEPTH));
-    Vector3 top_right =
-        controller.transform.TransformPoint(new Vector3(BOX_WIDTH, BOX_HEIGHT, BOX_DEPTH));
-    Vector3 bottom_left =
-        controller.transform.TransformPoint(new Vector3(-BOX_WIDTH, BOX_HEIGHT, -BOX_DEPTH));
-    Vector3 bottom_right =
-        controller.transform.TransformPoint(new Vector3(BOX_WIDTH, BOX_HEIGHT, -BOX_DEPTH));
+    Vector3 top_left = controller.transform.TransformPoint(new Vector3(-BOX_WIDTH, INTERACTION_RADIUS, BOX_DEPTH));
+    Vector3 top_right = controller.transform.TransformPoint(new Vector3(BOX_WIDTH, INTERACTION_RADIUS, BOX_DEPTH));
+    Vector3 bottom_left = controller.transform.TransformPoint(new Vector3(-BOX_WIDTH, INTERACTION_RADIUS, -BOX_DEPTH));
+    Vector3 bottom_right = controller.transform.TransformPoint(new Vector3(BOX_WIDTH, INTERACTION_RADIUS, -BOX_DEPTH));
 
     Handles.DrawLine(origin, top_left);
     Handles.DrawLine(origin, top_right);
