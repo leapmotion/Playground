@@ -20,7 +20,7 @@ public class DanceFloor : MonoBehaviour {
   private Texture2D texture_;
   private Color[] pixels_;
   private float time_ = 0.0f;
-  private bool playing_ = false;
+  private bool playing_ = true;
 
   void Start() {
     pixels_ = new Color[width * height];
@@ -31,6 +31,7 @@ public class DanceFloor : MonoBehaviour {
 
     texture_ = new Texture2D(width, height);
     texture_.filterMode = FilterMode.Point;
+    texture_.wrapMode = TextureWrapMode.Clamp;
     texture_.SetPixels(pixels_);
     texture_.Apply();
     renderer.material.mainTexture = texture_;
@@ -47,7 +48,7 @@ public class DanceFloor : MonoBehaviour {
       for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
           if (Random.Range(0.0f, 1.0f) < colorChance)
-            pixels_[y * width + x] = colors[Random.Range(0, colors.Length - 1)];
+            pixels_[y * width + x] = colors[Random.Range(0, colors.Length)];
           else
             pixels_[y * width + x] = defaultColor;
         }
