@@ -30,6 +30,10 @@ public class HandController : MonoBehaviour {
   private Dictionary<int, HandModel> hand_graphics_;
   private Dictionary<int, HandModel> hand_physics_;
   private Dictionary<int, ToolModel> tools_;
+
+  void Awake() {
+    Application.targetFrameRate = 60;
+  }
   
   void Start() {
     leap_controller_ = new Controller();

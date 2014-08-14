@@ -13,20 +13,22 @@ public class RobotDizzyHead : RobotHead {
   public float forceTowardCenter = 0.5f;
   public Vector3 center;
 
+  public ParticleSystem stars;
+
   private float perlin_noise_increment_ = 0.0f;
 
   void Start() {
     SetFaceAlpha(0.0f);
-    GetComponent<ParticleSystem>().Stop();
+    stars.Stop();
   }
 
   public override void BootUp() {
-    GetComponent<ParticleSystem>().Play();
+    stars.Play();
     SetFaceAlpha(1.0f);
   }
 
   public override void ShutDown() {
-    GetComponent<ParticleSystem>().Stop();
+    stars.Stop();
     SetFaceAlpha(0.0f);
   }
 

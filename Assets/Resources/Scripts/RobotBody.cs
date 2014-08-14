@@ -152,6 +152,7 @@ public class RobotBody : MonoBehaviour {
         AttachHead(closest_head);
       }
       else {
+        DisconnectHead();
         DrawLine(neck_position, closest_head.transform.position);
         if (spring == null)
           spring = gameObject.AddComponent<SpringJoint>();

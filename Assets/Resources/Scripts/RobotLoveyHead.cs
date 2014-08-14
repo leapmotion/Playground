@@ -21,9 +21,11 @@ public class RobotLoveyHead : RobotHead {
   public AnimationCurve spinTorqueCurve;
   public float spinFrequency = 1.0f;
 
+  public ParticleSystem hearts;
+
   void Start() {
     SetFaceAlpha(0.0f);
-    GetComponent<ParticleSystem>().Stop();
+    hearts.Stop();
   }
 
   public override void BootUp() {
@@ -33,7 +35,7 @@ public class RobotLoveyHead : RobotHead {
 
   public override void ShutDown() {
     SetFaceAlpha(0.0f);
-    GetComponent<ParticleSystem>().Stop();
+    hearts.Stop();
   }
 
   void NormalEyes() {
@@ -75,11 +77,11 @@ public class RobotLoveyHead : RobotHead {
 
     if (target == null) {
       NormalEyes();
-      GetComponent<ParticleSystem>().Stop();
+      hearts.Stop();
     }
     else {
-      if (!GetComponent<ParticleSystem>().isPlaying)
-        GetComponent<ParticleSystem>().Play();
+      if (!hearts.isPlaying)
+        hearts.Play();
       CycleLoveyEyes();
       Vector3 direction = (target.position - transform.position).normalized;
       Vector3 torque = loveRunSpeed * Vector3.Cross(direction, Vector3.up);

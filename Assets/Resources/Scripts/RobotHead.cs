@@ -27,12 +27,14 @@ public class RobotHead : MonoBehaviour {
 
   public void SetBody(RobotBody body) {
     robot_body_ = body;
-    /*
-    if (body == null)
-      GetComponent<AudioSource>().Stop();
-    else
-      GetComponent<AudioSource>().Play();
-      */
+    if (body == null) {
+      GetComponent<ChangeColorOnGrab>().Disconnect();
+      // GetComponent<AudioSource>().Stop();
+    }
+    else {
+      GetComponent<ChangeColorOnGrab>().Connect();
+      // GetComponent<AudioSource>().Play();
+    }
   }
 
   public RobotBody GetBody() {

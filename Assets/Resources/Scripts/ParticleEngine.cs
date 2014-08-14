@@ -12,15 +12,15 @@ public class ParticleEngine : MonoBehaviour {
   public Color slowColor = Color.white;
   public Color fastColor = Color.black;
   
-  private Controller leap_controller_;
-  private ParticleSystem particle_system_;
+  // private Controller leap_controller_;
+  // private ParticleSystem particle_system_;
   
   private const float height_ = 8.0f;
 
 	// Use this for initialization
 	void Start () {
-    leap_controller_ = new Controller();
-    particle_system_ = (ParticleSystem)(GameObject.Find("Particles").GetComponent(typeof(ParticleSystem)));
+    // leap_controller_ = new Controller();
+    // particle_system_ = (ParticleSystem)(GameObject.Find("Particles").GetComponent(typeof(ParticleSystem)));
 	}
 	
 	// Update is called once per frame
