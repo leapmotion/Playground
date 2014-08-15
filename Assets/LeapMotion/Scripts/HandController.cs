@@ -13,6 +13,7 @@ public class HandController : MonoBehaviour {
 
   // Reference distance from thumb base to pinky base in mm.
   protected const float MODEL_PALM_WIDTH = 85.0f;
+  protected const float GIZMO_SCALE = 5.0f;
 
   public bool separateLeftRight = false;
   public HandModel leftGraphicsModel;
@@ -22,30 +23,51 @@ public class HandController : MonoBehaviour {
 
   public ToolModel toolModel;
 
+  public bool mirrorZAxis = false;
+
+  // If hands are in charge of Destroying themselves, make this false.
+  public bool destroyHands = true;
+
   public Vector3 handMovementScale = Vector3.one;
 
-  public bool destroyHands;
+  // Recording parameters.
+  public bool enableRecordPlayback = false;
+  public TextAsset recordingAsset;
+  public KeyCode keyToRecord = KeyCode.None;
+  public KeyCode keyToSave = KeyCode.None;
+  public KeyCode keyToReset = KeyCode.None;
+  public int recorderStartTime = 0;
+  public float recorderSpeed = 1.0f;
+  public bool recorderLoop = true;
+  public int recorderDelay = 0;
+  
+  private LeapRecorder recorder_ = new LeapRecorder();
+  
   private Controller leap_controller_;
 
   private Dictionary<int, HandModel> hand_graphics_;
   private Dictionary<int, HandModel> hand_physics_;
   private Dictionary<int, ToolModel> tools_;
-
-  void Awake() {
-    Application.targetFrameRate = 60;
-  }
   
+  void OnDrawGizmos() {
+    Gizmos.matrix = Matrix4x4.Scale(GIZMO_SCALE * Vector3.one);
+    Gizmos.DrawIcon(transform.position, "leap_motion.png");
+  }
+
   void Start() {
     leap_controller_ = new Controller();
     hand_graphics_ = new Dictionary<int, HandModel>();
     hand_physics_ = new Dictionary<int, HandModel>();
 
     tools_ = new Dictionary<int, ToolModel>();
-    
+
     if (leap_controller_ == null) {
       Debug.LogWarning(
           "Cannot connect to controller. Make sure you have Leap Motion v2.0+ installed");
     }
+
+    if (enableRecordPlayback && recordingAsset != null)
+      recorder_.Load(recordingAsset);
   }
 
   private void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
@@ -78,6 +100,13 @@ public class HandController : MonoBehaviour {
     return hand_model;
   }
 
+  private void DestroyHand(HandModel hand_model) {
+    if (destroyHands)
+      Destroy(hand_model.gameObject);
+    else
+      hand_model.SetLeapHand(null);
+  }
+
   private void UpdateHandModels(Dictionary<int, HandModel> all_hands,
                                 HandList leap_hands,
                                 HandModel left_model, HandModel right_model) {
@@ -88,7 +117,15 @@ public class HandController : MonoBehaviour {
     for (int h = 0; h < num_hands; ++h) {
       Hand leap_hand = leap_hands[h];
       
-      HandModel model = leap_hand.IsLeft? left_model : right_model;
+      HandModel model = (mirrorZAxis != leap_hand.IsLeft) ? left_model : right_model;
+
+      // If we've mirrored since this hand was updated, destroy it.
+      if (all_hands.ContainsKey(leap_hand.Id) &&
+          all_hands[leap_hand.Id].IsMirrored() != mirrorZAxis) {
+        DestroyHand(all_hands[leap_hand.Id]);
+        all_hands.Remove(leap_hand.Id);
+      }
+
       // Only create or update if the hand is enabled.
       if (model != null) {
         ids_to_check.Remove(leap_hand.Id);
@@ -97,6 +134,7 @@ public class HandController : MonoBehaviour {
         if (!all_hands.ContainsKey(leap_hand.Id)) {
           HandModel new_hand = CreateHand(model);
           new_hand.SetLeapHand(leap_hand);
+          new_hand.MirrorZAxis(mirrorZAxis);
           new_hand.SetController(this);
 
           // Set scaling based on reference hand.
@@ -111,6 +149,7 @@ public class HandController : MonoBehaviour {
           // Make sure we update the Leap Hand reference.
           HandModel hand_model = all_hands[leap_hand.Id];
           hand_model.SetLeapHand(leap_hand);
+          hand_model.MirrorZAxis(mirrorZAxis);
 
           // Set scaling based on reference hand.
           float hand_scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
@@ -122,12 +161,8 @@ public class HandController : MonoBehaviour {
 
     // Destroy all hands with defunct IDs.
     for (int i = 0; i < ids_to_check.Count; ++i) {
-      if (destroyHands) {
-        Destroy(all_hands[ids_to_check[i]].gameObject);
-        all_hands.Remove(ids_to_check[i]);
-      }
-      else
-        all_hands[ids_to_check[i]].SetLeapHand(null);
+      DestroyHand(all_hands[ids_to_check[i]]);
+      all_hands.Remove(ids_to_check[i]);
     }
   }
 
@@ -165,6 +200,7 @@ public class HandController : MonoBehaviour {
         // Make sure we update the Leap Tool reference.
         ToolModel tool_model = all_tools[leap_tool.Id];
         tool_model.SetLeapTool(leap_tool);
+        tool_model.MirrorZAxis(mirrorZAxis);
 
         // Set scaling.
         tool_model.transform.localScale = transform.localScale;
@@ -180,23 +216,58 @@ public class HandController : MonoBehaviour {
     }
   }
 
+  void UpdateRecorder() {
+    if (!enableRecordPlayback)
+      return;
+
+    recorder_.startTime = recorderStartTime;
+    recorder_.speed = recorderSpeed;
+    recorder_.loop = recorderLoop;
+    recorder_.delay = recorderDelay;
+
+    if (Input.GetKeyDown(keyToRecord)) {
+      recorder_.state = RecorderState.Recording;
+    }
+    else if (Input.GetKeyDown(keyToSave)) {
+      recorder_.state = RecorderState.Playing;
+      recordingAsset = recorder_.SaveToNewFile();
+      recorder_.Load(recordingAsset);
+      recorder_.SetDefault();
+    }
+    else if (Input.GetKeyDown(keyToReset)) {
+      recorder_.Reset();
+    }
+
+    if (recorder_.state == RecorderState.Recording) {
+      recorder_.AddFrame(leap_controller_.Frame());
+    }
+    else {
+      recorder_.NextFrame();
+    }
+  }
+
+  Frame GetFrame() {
+    if (enableRecordPlayback && recorder_.state == RecorderState.Playing)
+      return recorder_.GetCurrentFrame();
+
+    return leap_controller_.Frame();
+  }
+
   void Update() {
     if (leap_controller_ == null)
       return;
-   
-    Frame frame = leap_controller_.Frame();
     
+    UpdateRecorder();
+    Frame frame = GetFrame();
     UpdateHandModels(hand_graphics_, frame.Hands, leftGraphicsModel, rightGraphicsModel);
   }
 
   void FixedUpdate() {
     if (leap_controller_ == null)
       return;
-     
-    Frame frame = leap_controller_.Frame();
 
+    Frame frame = GetFrame();
     UpdateHandModels(hand_physics_, frame.Hands, leftPhysicsModel, rightPhysicsModel);
     UpdateToolModels(tools_, frame.Tools, toolModel);
   }
 }
-
