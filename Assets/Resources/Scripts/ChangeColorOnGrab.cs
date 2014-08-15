@@ -7,7 +7,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class ChangeColorOnGrab : Grabbable {
+public class ChangeColorOnGrab : GrabbableObject {
 
   public Color colorGrabbed;
   public Color colorReleased;

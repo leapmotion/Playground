@@ -127,6 +127,9 @@ public class HandControllerEditor : Editor {
     controller.handMovementScale =
         EditorGUILayout.Vector3Field("Hand Movement Scale", controller.handMovementScale);
 
+    controller.destroyHands = EditorGUILayout.Toggle("Destroy Hands",
+                                                      controller.destroyHands);
+
     controller.enableRecordPlayback = EditorGUILayout.Toggle("Enable Record/Playback",
                                                              controller.enableRecordPlayback);
     if (controller.enableRecordPlayback) {
