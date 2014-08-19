@@ -6,6 +6,7 @@ public class RobotHead : MonoBehaviour {
   protected RobotBody robot_body_;
 
   public Transform face;
+  public AudioClip bootUpNoise;
 
   protected void SetFaceAlpha(float alpha) {
     if (face == null)
@@ -13,13 +14,14 @@ public class RobotHead : MonoBehaviour {
 
     Renderer[] renderers = face.GetComponentsInChildren<Renderer>();
     foreach (Renderer renderer in renderers) {
-      Color color = renderer.material.GetColor ("_TintColor");;
+      Color color = renderer.material.GetColor("_TintColor");
       color.a = alpha;
-      renderer.material.SetColor ("_TintColor", color);
+      renderer.material.SetColor("_TintColor", color);
     }
   }
 
   public virtual void BootUp() {
+    audio.PlayOneShot(bootUpNoise, 10.0f);
   }
 
   public virtual void ShutDown() {
@@ -29,11 +31,11 @@ public class RobotHead : MonoBehaviour {
     robot_body_ = body;
     if (body == null) {
       GetComponent<ChangeColorOnGrab>().Disconnect();
-      // GetComponent<AudioSource>().Stop();
+      // audio.Stop();
     }
     else {
       GetComponent<ChangeColorOnGrab>().Connect();
-      // GetComponent<AudioSource>().Play();
+      // audio.Play();
     }
   }
 

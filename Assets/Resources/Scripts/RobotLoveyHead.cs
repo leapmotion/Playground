@@ -29,11 +29,13 @@ public class RobotLoveyHead : RobotHead {
   }
 
   public override void BootUp() {
+    base.BootUp();
     SetFaceAlpha(1.0f);
     active_time_ = 0.0f;
   }
 
   public override void ShutDown() {
+    base.ShutDown();
     SetFaceAlpha(0.0f);
     hearts.Stop();
   }

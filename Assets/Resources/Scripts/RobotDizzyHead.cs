@@ -23,11 +23,13 @@ public class RobotDizzyHead : RobotHead {
   }
 
   public override void BootUp() {
+    base.BootUp();
     stars.Play();
     SetFaceAlpha(1.0f);
   }
 
   public override void ShutDown() {
+    base.ShutDown();
     stars.Stop();
     SetFaceAlpha(0.0f);
   }

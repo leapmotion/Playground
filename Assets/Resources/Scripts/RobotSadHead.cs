@@ -20,12 +20,14 @@ public class RobotSadHead : RobotHead {
   }
 
   public override void BootUp() {
+    base.BootUp();
     cloud.Play();
     SetFaceAlpha(1.0f);
     time_alive_ = 0.0f;
   }
 
   public override void ShutDown() {
+    base.ShutDown();
     cloud.Stop();
     rain.Stop();
     SetFaceAlpha(0.0f);

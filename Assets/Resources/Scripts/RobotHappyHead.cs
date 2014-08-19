@@ -28,12 +28,14 @@ public class RobotHappyHead : RobotHead {
   }
 
   public override void BootUp() {
+    base.BootUp();
     SetFaceAlpha(1.0f);
     SpringJoint bounce = robot_body_.feet.GetComponent<SpringJoint>();
     resting_anchor_ = bounce.connectedAnchor;
   }
 
   public override void ShutDown() {
+    base.ShutDown();
     SetFaceAlpha(0.0f);
     SpringJoint bounce = robot_body_.feet.GetComponent<SpringJoint>();
     bounce.connectedAnchor = resting_anchor_;

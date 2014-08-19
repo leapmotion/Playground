@@ -18,17 +18,31 @@ public class RobotBody : MonoBehaviour {
   public float attachRadius = 0.3f;
   public float breakForce = 10.0f;
   public float breakTorque = 10.0f;
+  public float uprightAngle = 60.0f;
+  public float uprightForce = 1.0f;
   public HingeJoint[] armJoints;
+  public float fallenWaitTime = 2.0f;
+  public float upsideDownAngle = 100.0f;
 
   public Roller feet;
 
   private float lightning_noise_phase_ = 0.0f;
-  private RobotHead robot_head_;
+  private RobotHead robot_head_ = null;
+  private bool is_upright_ = true;
+  private float fallen_time_ = 0.0f;
+
+  void Start() {
+    rigidbody.maxAngularVelocity = 20;
+  }
 
   void RemoveLine() {
     LineRenderer line_renderer = GetComponent<LineRenderer>();
     if (line_renderer != null)
       line_renderer.SetVertexCount(0);
+  }
+
+  public bool IsUpright() {
+    return is_upright_;
   }
 
   void DrawLine(Vector3 start, Vector3 end) {
@@ -114,7 +128,6 @@ public class RobotBody : MonoBehaviour {
       robot_head_.SetOrientation(transform.up, robot_face_vector);
       robot_head_.BootUp();
     }
-
   }
 
   void LookForHead() {
@@ -143,6 +156,7 @@ public class RobotBody : MonoBehaviour {
       RemoveLine();
       if (spring != null)
         Destroy(spring);
+      audio.Stop();
     }
     else {
       if (closest_head.GetComponent<RobotHead>() != robot_head_)
@@ -150,10 +164,12 @@ public class RobotBody : MonoBehaviour {
 
       if ((head_center_position - closest_head.transform.position).magnitude < attachRadius) {
         AttachHead(closest_head);
+        audio.Stop();
       }
       else {
         DisconnectHead();
         DrawLine(neck_position, closest_head.transform.position);
+        audio.Play();
         if (spring == null)
           spring = gameObject.AddComponent<SpringJoint>();
 
@@ -190,5 +206,19 @@ public class RobotBody : MonoBehaviour {
 
       robot_head_.SetOrientation(transform.up, robot_face_vector);
     }
+
+    Quaternion uprightness = Quaternion.FromToRotation(Vector3.up, transform.up);
+    float upright_angle = 0;
+    Vector3 upright_axis = Vector3.up;
+    uprightness.ToAngleAxis(out upright_angle, out upright_axis);
+    is_upright_ = upright_angle < uprightAngle;
+
+    if (!is_upright_) {
+      fallen_time_ += Time.deltaTime;
+      if (upright_angle < upsideDownAngle && fallen_time_ > fallenWaitTime)
+        rigidbody.AddTorque(-uprightForce * upright_axis);
+    }
+    else
+      fallen_time_ = 0.0f;
 	}
 }
