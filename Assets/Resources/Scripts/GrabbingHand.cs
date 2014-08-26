@@ -70,15 +70,14 @@ public class GrabbingHand : MonoBehaviour {
     for (int j = 0; j < close_things.Length; ++j) {
       Vector3 new_distance = pinch_position - close_things[j].transform.position;
       if (close_things[j].rigidbody != null && new_distance.magnitude < distance.magnitude &&
-          !close_things[j].transform.IsChildOf(transform)) {
+          !close_things[j].transform.IsChildOf(transform) &&
+          close_things[j].tag != "NotGrabbable") {
         grabbed_ = close_things[j];
         distance = new_distance;
       }
     }
 
     if (grabbed_ != null) {
-      last_max_angular_velocity_ = grabbed_.rigidbody.maxAngularVelocity;
-      grabbed_.rigidbody.maxAngularVelocity = Mathf.Infinity;
       IgnoreCollisions(grabbed_.gameObject, true);
 
       palm_rotation_ = hand_model.GetPalmRotation();
@@ -86,6 +85,10 @@ public class GrabbingHand : MonoBehaviour {
       current_pinch_ = grabbed_.transform.position;
 
       GrabbableObject grabbable = grabbed_.GetComponent<GrabbableObject>();
+      if (grabbable == null || grabbable.rotateQuickly) {
+        last_max_angular_velocity_ = grabbed_.rigidbody.maxAngularVelocity;
+        grabbed_.rigidbody.maxAngularVelocity = Mathf.Infinity;
+      }
       if (grabbable != null) {
         grabbable.OnGrab();
 
@@ -117,12 +120,15 @@ public class GrabbingHand : MonoBehaviour {
     pinching_ = false;
     releasing_ = false;
     if (grabbed_ != null) {
-      grabbed_.rigidbody.maxAngularVelocity = last_max_angular_velocity_;
-      IgnoreCollisions(grabbed_.gameObject, false);
-
       GrabbableObject grabbable = grabbed_.GetComponent<GrabbableObject>();
       if (grabbable != null)
         grabbable.OnRelease();
+
+      if (grabbable == null || grabbable.rotateQuickly)
+        grabbed_.rigidbody.maxAngularVelocity = last_max_angular_velocity_;
+
+      IgnoreCollisions(grabbed_.gameObject, false);
+
     }
     grabbed_ = null;
   }

@@ -18,6 +18,7 @@ public class GrabbableObject : MonoBehaviour {
   public Joint breakableJoint;
   public float breakForce;
   public float breakTorque;
+  public bool rotateQuickly = true;
 
   protected bool grabbed_ = false;
 

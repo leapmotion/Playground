@@ -169,9 +169,10 @@ public class RobotBody : MonoBehaviour {
       else {
         DisconnectHead();
         DrawLine(neck_position, closest_head.transform.position);
-        audio.Play();
-        if (spring == null)
+        if (spring == null) {
           spring = gameObject.AddComponent<SpringJoint>();
+          audio.Play();
+        }
 
         spring.connectedBody = closest_head.rigidbody;
         spring.anchor = headCenterOffset;
