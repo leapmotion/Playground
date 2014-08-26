@@ -22,7 +22,7 @@ public class Roller : MonoBehaviour {
     return upright.IsUpright();
   }
 	
-	void Update () {
+	void FixedUpdate () {
     if (upright.IsUpright()) {
       float rotation_angle = 0;
       Vector3 rotation_axis;
@@ -39,7 +39,7 @@ public class Roller : MonoBehaviour {
           angleForceScale * Mathf.Tan(rotation_angle / 180.0f * Mathf.PI) * rotation_axis +
           angularVelocityForceScale * velocity_diff_rotation -
           velocityForceScale * velocity_rotation;
-      rigidbody.AddTorque(force);
+      rigidbody.AddTorque(force * Time.deltaTime * 50);
     }
 	}
 }

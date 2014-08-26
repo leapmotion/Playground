@@ -29,15 +29,17 @@ public class SpringyMesh : MonoBehaviour {
     for (int i = 0; i < num_vertices_; ++i) {
       positions_[i] = springy_mesh_.vertices[i];
       resting_positions_[i] = positions_[i];
+
+      positions_[i].x *= 2.0f;
+      positions_[i].y /= 2.0f;
     }
   }
 
   void InitVelocities() {
     velocities_ = new Vector3[num_vertices_];
-    for (int i = 0; i < num_vertices_; ++i)
+    for (int i = 0; i < num_vertices_; ++i) {
       velocities_[i] = Vector3.zero;
-
-    velocities_[0] = Vector3.up;
+    }
   }
 
   void Update() {
@@ -47,9 +49,28 @@ public class SpringyMesh : MonoBehaviour {
 
   void FixedUpdate () {
     // Neighbor forces.
-    int triangle_length = springy_mesh_.triangles.Length;
-    for (int i = 0; i < triangle_length; ++i) {
-      
+    int[] triangles = springy_mesh_.triangles;
+    int triangle_length = triangles.Length;
+    for (int i = 0; i < triangle_length;) {
+      int one = triangles[i++];
+      int two = triangles[i++];
+      int three = triangles[i++];
+
+      Vector3 delta_one_two = positions_[one] - positions_[two];
+      Vector3 delta_two_three = positions_[two] - positions_[three];
+      Vector3 delta_three_one = positions_[three] - positions_[one];
+
+      float normal_distance1 = (resting_positions_[three] - resting_positions_[one]).magnitude;
+      float normal_distance2 = (resting_positions_[one] - resting_positions_[two]).magnitude;
+      float normal_distance3 = (resting_positions_[two] - resting_positions_[three]).magnitude;
+
+      float distance1 = delta_three_one.magnitude - normal_distance1;
+      float distance2 = delta_one_two.magnitude - normal_distance2;
+      float distance3 = delta_two_three.magnitude - normal_distance3;
+
+      velocities_[two] += neighborSpringForce * distance2 * delta_one_two.normalized;
+      velocities_[three] += neighborSpringForce * distance3 * delta_two_three.normalized;
+      velocities_[one] += neighborSpringForce * distance1 * delta_three_one.normalized;
     }
 
     // Sphere shape forces.
