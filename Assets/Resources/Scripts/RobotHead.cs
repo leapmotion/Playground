@@ -7,6 +7,7 @@ public class RobotHead : MonoBehaviour {
 
   public Transform face;
   public AudioClip bootUpNoise;
+  public AudioClip shutDownNoise;
 
   protected void SetFaceAlpha(float alpha) {
     if (face == null)
@@ -25,6 +26,7 @@ public class RobotHead : MonoBehaviour {
   }
 
   public virtual void ShutDown() {
+    audio.PlayOneShot(shutDownNoise, 10.0f);
   }
 
   public void SetBody(RobotBody body) {
