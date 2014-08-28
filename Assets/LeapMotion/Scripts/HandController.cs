@@ -236,6 +236,12 @@ public class HandController : MonoBehaviour {
     UpdateToolModels(tools_, frame.Tools, toolModel);
   }
 
+  public HandModel[] GetAllGraphicHands() {
+    HandModel[] models = new HandModel[hand_graphics_.Count];
+    hand_graphics_.Values.CopyTo(models, 0);
+    return models;
+  }
+
   public float GetRecordingProgress() {
     return recorder_.GetProgress();
   }
