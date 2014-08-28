@@ -1,4 +1,10 @@
-﻿using UnityEditor;
+﻿/******************************************************************************\
+* Copyright (C) Leap Motion, Inc. 2011-2014.                                   *
+* Leap Motion proprietary. Licensed under Apache 2.0                           *
+* Available at http://www.apache.org/licenses/LICENSE-2.0.html                 *
+\******************************************************************************/
+
+using UnityEditor;
 using UnityEngine;
 using System.Collections;
 
@@ -137,23 +143,10 @@ public class HandControllerEditor : Editor {
           (TextAsset)EditorGUILayout.ObjectField("Recording File",
                                                  controller.recordingAsset,
                                                  typeof(TextAsset), true);
-      controller.recorderStartTime = EditorGUILayout.IntField("Playback Start Time",
-                                                               controller.recorderStartTime);
       controller.recorderSpeed = EditorGUILayout.FloatField("Playback Speed Multiplier",
                                                              controller.recorderSpeed);
       controller.recorderLoop = EditorGUILayout.Toggle("Playback Loop",
                                                         controller.recorderLoop);
-      if (controller.recorderLoop) {
-        controller.recorderDelay = EditorGUILayout.IntField("Loop Delay",
-                                                             controller.recorderDelay);
-      }
-
-      controller.keyToRecord = (KeyCode)EditorGUILayout.EnumPopup("Key To Record",
-                                                                  controller.keyToRecord);
-      controller.keyToSave = (KeyCode)EditorGUILayout.EnumPopup("Key To Save Recording",
-                                                                controller.keyToSave);
-      controller.keyToReset = (KeyCode)EditorGUILayout.EnumPopup("Key To Reset Recording",
-                                                                 controller.keyToReset);      
     }
         
     if (GUI.changed)
