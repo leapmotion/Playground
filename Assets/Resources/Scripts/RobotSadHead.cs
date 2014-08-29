@@ -16,7 +16,10 @@ public class RobotSadHead : RobotHead {
   private int dance_moves_ = 0;
 
   void Start() {
-    ShutDown();
+    cloud.Stop();
+    rain.Stop();
+    SetFaceAlpha(0.0f);
+    dance_moves_ = 0;
   }
 
   public override void BootUp() {

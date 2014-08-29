@@ -14,6 +14,7 @@ public class Rotate : MonoBehaviour {
 
 	void Update () {
     float angle = Time.deltaTime * degreesPerSecond;
-    transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, rotateVector);
+    Vector3 vector = rotateVector;
+    transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, vector);
 	}
 }

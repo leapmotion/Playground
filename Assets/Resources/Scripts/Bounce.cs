@@ -7,14 +7,19 @@
 using UnityEngine;
 using System.Collections;
 
-public class TextureRotater : MonoBehaviour {
+public class Bounce : MonoBehaviour {
 
-  public float rotateFrequency = 1.0f;
+  public Vector3 bounceMagnitude;
+  public float bouncesPerSecond;
+  public Vector3 startPosition;
 
-  private float offset = 0.0f;
+  private float bounces = 0.0f;
 
-  void Update() {
-    offset += Time.deltaTime * rotateFrequency;
-    renderer.material.SetTextureOffset("_MainTex", new Vector2(0.5f, offset));
+  void Start() {
+    startPosition = transform.position;
   }
+
+	void Update () {
+    bounces += Time.deltaTime * bouncesPerSecond;
+	}
 }

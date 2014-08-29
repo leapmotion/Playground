@@ -9,6 +9,8 @@ public class SpringyMesh : MonoBehaviour {
   public float damping = 0.1f;
   public float maxVertexVelocity = 0.2f;
   public float prodFrequency = 1.0f;
+  public float mushStrength = 1.0f;
+  public float mushStrengthVertical = 1.0f;
 
   private Mesh springy_mesh_;
   private Dictionary<int, int> vertex_duplicates_ = new Dictionary<int, int>();
@@ -71,6 +73,32 @@ public class SpringyMesh : MonoBehaviour {
     velocities_[vertex] += velocity_bump;
   }
 
+  void MushMesh3() {
+    for (int i = 0; i < num_vertices_; ++i) {
+      float s = resting_positions_[i].x * resting_positions_[i].x +
+                resting_positions_[i].z * resting_positions_[i].z;
+      velocities_[i] += s * s * s * mushStrength * transform.TransformDirection(resting_positions_[i]);
+
+      float y = resting_positions_[i].y;
+      velocities_[i] += y * y * y * y * mushStrengthVertical * transform.TransformDirection(Vector3.up);
+    }
+  }
+
+  void MushMesh2() {
+    for (int i = 0; i < num_vertices_; ++i) {
+      float s = resting_positions_[i].x * resting_positions_[i].x +
+                resting_positions_[i].z * resting_positions_[i].z;
+      velocities_[i] += s * s * s * mushStrength * transform.TransformDirection(resting_positions_[i]);
+    }
+  }
+
+  void MushMesh() {
+    for (int i = 0; i < num_vertices_; ++i) {
+      float y = resting_positions_[i].y;
+      velocities_[i] += y * mushStrength * transform.TransformDirection(Vector3.up);
+    }
+  }
+
   void ApplyNeighborForces() {
     int[] triangles = springy_mesh_.triangles;
     int triangle_length = triangles.Length;
@@ -91,16 +119,17 @@ public class SpringyMesh : MonoBehaviour {
       float distance2 = delta_one_two.magnitude - normal_distance2;
       float distance3 = delta_two_three.magnitude - normal_distance3;
 
-      if (delta_one_two.magnitude != 0)
+      if (delta_one_two.magnitude != 0 && distance2 != 0)
         velocities_[two] += neighborSpringForce * distance2 * delta_one_two.normalized;
-      if (delta_two_three.magnitude != 0)
+      if (delta_two_three.magnitude != 0 && distance3 != 0)
         velocities_[three] += neighborSpringForce * distance3 * delta_two_three.normalized;
-      if (delta_three_one.magnitude != 0)
+      if (delta_three_one.magnitude != 0 && distance1 != 0)
         velocities_[one] += neighborSpringForce * distance1 * delta_three_one.normalized;
     }
   }
 
   void FixedUpdate () {
+    MushMesh3();
     ApplyNeighborForces();
 
     // Sphere shape forces.
