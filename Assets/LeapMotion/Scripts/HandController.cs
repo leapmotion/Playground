@@ -49,8 +49,11 @@ public class HandController : MonoBehaviour {
     Gizmos.DrawIcon(transform.position, "leap_motion.png");
   }
 
-  void Start() {
+  void Awake() {
     leap_controller_ = new Controller();
+  }
+
+  void Start() {
     hand_graphics_ = new Dictionary<int, HandModel>();
     hand_physics_ = new Dictionary<int, HandModel>();
 
@@ -270,6 +273,10 @@ public class HandController : MonoBehaviour {
 
   public void Record() {
     recorder_.Record();
+  }
+
+  public bool IsConnected() {
+    return leap_controller_.IsConnected;
   }
 
   void UpdateRecorder() {

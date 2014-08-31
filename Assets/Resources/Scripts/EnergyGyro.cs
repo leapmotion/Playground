@@ -19,41 +19,49 @@ public class EnergyGyro : MonoBehaviour {
   public float shrinkTime = 3.0f;
   public float endEmissionGain = 0.7f;
   public float endTiling = 0.0f;
+  public AnimationCurve shrinkCurve;
 
-  private float current_size_;
-  private float current_gain_;
+  private float shrink_percent_ = 0.0f;
   private float start_size_;
   private float start_emission_gain_;
+  private float start_tiling_;
   private float charge_level_ = 0.0f;
   private bool charged = false;
 
 	void Update () {
-    if (charged) {
-      if (current_size_ > shrinkSize) {
-        float update_size = Time.deltaTime * (start_size_ - shrinkSize) / shrinkTime;
-        current_size_ -= update_size;
-        transform.localScale = new Vector3(current_size_, current_size_, current_size_);
-
-        float update_gain = Time.deltaTime * (start_emission_gain_ - endEmissionGain) / shrinkTime;
-        current_gain_ -= update_gain;
-        rings[0].material.SetFloat("_EmissionGain", current_gain_);
-      }
-    }
     for (int i = 0; i < gimbals.Length; ++i) {
       float degreesPerSecond = startSpeeds[i] + charge_level_ * (endSpeeds[i] - startSpeeds[i]);
       gimbals[i].degreesPerSecond = degreesPerSecond;
     }
 
-    if (!charged) {
+    if (charged) {
+      if (shrink_percent_ < 1.0f) {
+        shrink_percent_ += Time.deltaTime / shrinkTime;
+        float shrink_amount = shrinkCurve.Evaluate(shrink_percent_);
+
+        float size = start_size_ + shrink_amount * (shrinkSize - start_size_);
+        transform.localScale = size * Vector3.one;
+
+        float gain = start_emission_gain_ +
+                     shrink_amount * (endEmissionGain - start_emission_gain_);
+        rings[0].material.SetFloat("_EmissionGain", gain);
+
+        float tiling = start_tiling_ + shrink_amount * (endTiling - start_tiling_);
+        float offset =  0.5f - tiling / 2.0f;
+        for (int i = 0; i < rings.Length; ++i) {
+          rings[i].material.SetTextureScale("_MainTex", new Vector2(0.0f, tiling));
+          rings[i].material.SetTextureOffset("_MainTex", new Vector2(0.5f, offset));
+        }
+      }
+    }
+    else {
       charge_level_ *= (1 - damping);
 
       if (charge_level_ >= chargeTransition) {
         charged = true;
         start_size_ = transform.localScale.x;
         start_emission_gain_ = rings[0].material.GetFloat("_EmissionGain");
-        Debug.Log(start_size_);
-        current_size_ = start_size_;
-        current_gain_ = start_emission_gain_;
+        start_tiling_ = rings[0].material.GetTextureScale("_MainTex")[1];
       }
     }
 	}

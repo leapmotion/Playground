@@ -11,6 +11,9 @@ public class SpringyMesh : MonoBehaviour {
   public float prodFrequency = 1.0f;
   public float mushStrength = 1.0f;
   public float mushStrengthVertical = 1.0f;
+  public float suckStrength = 1.0f;
+  public float dotSuckDistance = 0.8f;
+  public float equatorialSuckBoost = 0.4f;
 
   private Mesh springy_mesh_;
   private Dictionary<int, int> vertex_duplicates_ = new Dictionary<int, int>();
@@ -71,6 +74,34 @@ public class SpringyMesh : MonoBehaviour {
 
   void ProdVertex(int vertex, Vector3 velocity_bump) {
     velocities_[vertex] += velocity_bump;
+  }
+
+  public void SuckMesh(Vector3 location) {
+    Vector3 local_position = transform.InverseTransformPoint(location);
+    for (int i = 0; i < num_vertices_; ++i) {
+      float dot = Vector3.Dot(local_position, resting_positions_[i]);
+      if (dot >= dotSuckDistance) {
+        float equatorial = 1 - 4 * resting_positions_[i].y * resting_positions_[i].y;
+        float strength = suckStrength + equatorialSuckBoost * equatorial;
+        velocities_[i] += strength * resting_positions_[i];
+      }
+    }
+  }
+
+  public Vector3 GetZappingPoint(Vector3 location) {
+    Vector3 local_position = transform.InverseTransformPoint(location);
+    float closest_dot = 0.0f;
+    Vector3 zap = Vector3.zero;
+
+    for (int i = 0; i < num_vertices_; ++i) {
+      float dot = Vector3.Dot(local_position, resting_positions_[i]);
+      if (dot > closest_dot) {
+        zap = positions_[i];
+        closest_dot = dot;
+      }
+    }
+
+    return transform.TransformPoint(zap);
   }
 
   void MushMesh3() {

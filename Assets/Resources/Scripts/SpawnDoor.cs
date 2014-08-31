@@ -17,10 +17,19 @@ public class SpawnDoor : MonoBehaviour {
 
   private GameObject current_spawn_;
   private float spawn_time_ = 0.0f;
+  private int num_spawns_ = 0;
 
   void Start() {
     SetDoorOpenness(0);
     spawn_time_ = spawnTime;
+  }
+
+  public int GetNumSpawns() {
+    return num_spawns_;
+  }
+
+  public bool IsSpawning() {
+    return spawn_time_ <= spawnTime || current_spawn_ != null;
   }
 
   void SetDoorOpenness(float openness) {
@@ -41,16 +50,18 @@ public class SpawnDoor : MonoBehaviour {
     }
   }
 
-  void StartSpawn() {
+  public void StartSpawn() {
     spawn_time_ = 0.0f;
   }
 
   void ActivateSpawn() {
+    num_spawns_++;
     Rigidbody[] rigidbodies = current_spawn_.GetComponentsInChildren<Rigidbody>();
     foreach (Rigidbody body in rigidbodies) {
       body.detectCollisions = true;
       body.useGravity = true;
     }
+    current_spawn_ = null;
   }
 
   void Update() {
@@ -71,7 +82,6 @@ public class SpawnDoor : MonoBehaviour {
     else {
       if (current_spawn_ != null) {
         ActivateSpawn();
-        current_spawn_ = null;
       }
       SetDoorOpenness(0);
     }
