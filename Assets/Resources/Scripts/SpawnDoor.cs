@@ -65,9 +65,6 @@ public class SpawnDoor : MonoBehaviour {
   }
 
   void Update() {
-    if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.Space))
-      StartSpawn();
-
     if (spawn_time_ <= doorOpenTime) {
       SetDoorOpenness(openCurve.Evaluate(spawn_time_ / doorOpenTime));
     }

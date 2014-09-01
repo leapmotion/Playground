@@ -11,8 +11,8 @@ public class PressAnyKeyToContinue : MonoBehaviour {
 
   public float waitTime = 1.0f;
 
-	public void Update() {
-    if (Input.anyKeyDown && Time.timeSinceLevelLoad >= waitTime)
+	public void OnGUI() {
+    if (Event.current.type == EventType.KeyDown && Time.timeSinceLevelLoad >= waitTime)
       Application.LoadLevel(Application.loadedLevel + 1);
   }
 }

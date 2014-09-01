@@ -10,17 +10,30 @@ using Leap;
 
 public class FadeRecording : MonoBehaviour {
 
-  public float startTime = 0.0f;
+  public float startTime = 3.0f;
   public float fadeInLength = 0.01f;
   public float fadeOutLength = 0.01f;
   public float maxTransparency = 0.5f;
   public Material material;
+
+  private bool played = false;
   
   void Start() {
+    HandController controller = GetComponent<HandController>();
+    controller.PauseRecording();
   }
 
   void Update() {
+    if (Time.timeSinceLevelLoad < startTime)
+      return;
+
     HandController controller = GetComponent<HandController>();
+    if (!played) {
+      controller.StopRecording();
+      controller.PlayRecording();
+      played = true;
+    }
+
     float progress = controller.GetRecordingProgress();
 
     float alpha = maxTransparency;
