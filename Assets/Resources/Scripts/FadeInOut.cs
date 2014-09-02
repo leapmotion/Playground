@@ -11,6 +11,7 @@ using Leap;
 public class FadeInOut : MonoBehaviour {
 
   public float fadeInTime = 0.01f;
+  public float fadeOutTime = 0.01f;
   
   private float alpha_ = 0.0f;
   private float last_time_;
@@ -26,7 +27,7 @@ public class FadeInOut : MonoBehaviour {
 
     Hand leap_hand = GetComponent<HandModel>().GetLeapHand();
     if (leap_hand == null) {
-      alpha_ -= delta_time / fadeInTime;
+      alpha_ -= delta_time / fadeOutTime;
       if (alpha_ <= 0) {
         Destroy(gameObject);
         return;
@@ -39,9 +40,11 @@ public class FadeInOut : MonoBehaviour {
 
     Renderer[] renderers = GetComponentsInChildren<Renderer>();
     for (int i = 0; i < renderers.Length; ++i) {
-      Color main_color = renderers[i].material.color;
-      main_color.a = alpha_ * alpha_;
-      renderers[i].material.color = main_color;
+      if (renderers[i].material.HasProperty("_Color")) {
+        Color main_color = renderers[i].material.color;
+        main_color.a = alpha_ * alpha_;
+        renderers[i].material.color = main_color;
+      }
     }
   }
 }

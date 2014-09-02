@@ -115,7 +115,7 @@ public class FingerLightning : MonoBehaviour {
   }
 
   void Update() {
-    // ZapEnergyGyros();
-    ZapElectroSpheres();
+    ZapEnergyGyros();
+    // ZapElectroSpheres();
   }
 }

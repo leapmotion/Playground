@@ -20,6 +20,7 @@ public class FadeRecording : MonoBehaviour {
   
   void Start() {
     HandController controller = GetComponent<HandController>();
+    controller.enabled = false;
     controller.PauseRecording();
   }
 
@@ -29,6 +30,7 @@ public class FadeRecording : MonoBehaviour {
 
     HandController controller = GetComponent<HandController>();
     if (!played) {
+      controller.enabled = true;
       controller.StopRecording();
       controller.PlayRecording();
       played = true;

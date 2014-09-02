@@ -34,6 +34,8 @@ public class EnergyGyro : MonoBehaviour {
       gimbals[i].degreesPerSecond = degreesPerSecond;
     }
 
+    Renderer[] renderers = GetComponentsInChildren<Renderer>();
+
     if (charged) {
       if (shrink_percent_ < 1.0f) {
         shrink_percent_ += Time.deltaTime / shrinkTime;
@@ -44,7 +46,9 @@ public class EnergyGyro : MonoBehaviour {
 
         float gain = start_emission_gain_ +
                      shrink_amount * (endEmissionGain - start_emission_gain_);
-        rings[0].material.SetFloat("_EmissionGain", gain);
+
+        foreach (Renderer render in renderers)
+          render.material.SetFloat("_EmissionGain", gain);
 
         float tiling = start_tiling_ + shrink_amount * (endTiling - start_tiling_);
         float offset =  0.5f - tiling / 2.0f;

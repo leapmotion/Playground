@@ -7,8 +7,10 @@ public class DisconnectionNotice : MonoBehaviour {
   public float fadeInTime = 1.0f;
   public float fadeOutTime = 1.0f;
   public AnimationCurve fade;
+  public int waitFrames = 10;
 
   private float fadedIn = 0.0f;
+  private int frames_disconnected_ = 0;
 
   void Start() {
     if (controller.IsConnected())
@@ -26,6 +28,11 @@ public class DisconnectionNotice : MonoBehaviour {
 
   void Update() {
     if (controller.IsConnected())
+      frames_disconnected_ = 0;
+    else
+      frames_disconnected_++;
+
+    if (frames_disconnected_ < waitFrames)
       fadedIn -= Time.deltaTime / fadeOutTime;
     else
       fadedIn += Time.deltaTime / fadeInTime;
