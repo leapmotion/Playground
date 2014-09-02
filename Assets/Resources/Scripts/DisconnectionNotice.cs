@@ -13,11 +13,7 @@ public class DisconnectionNotice : MonoBehaviour {
   private int frames_disconnected_ = 0;
 
   void Start() {
-    if (controller.IsConnected())
-      fadedIn = 0.0f;
-    else
-      fadedIn = 1.0f;
-    SetAlpha(fadedIn);
+    SetAlpha(0.0f);
   }
 
   void SetAlpha(float alpha) {
