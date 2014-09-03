@@ -15,9 +15,6 @@ public class DisconnectionNotice : MonoBehaviour {
 
   void Start() {
     SetAlpha(0.0f);
-    if (embeddedReplacementImage != null && controller.IsEmbedded()) {
-      renderer.material.mainTexture = embeddedReplacementImage;
-    }
   }
 
   void SetAlpha(float alpha) {
@@ -27,6 +24,10 @@ public class DisconnectionNotice : MonoBehaviour {
   }
 
   void Update() {
+    if (embeddedReplacementImage != null && controller.IsEmbedded()) {
+      renderer.material.mainTexture = embeddedReplacementImage;
+    }
+
     if (controller.IsConnected())
       frames_disconnected_ = 0;
     else
