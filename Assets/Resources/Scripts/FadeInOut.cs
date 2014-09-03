@@ -11,10 +11,12 @@ using Leap;
 public class FadeInOut : MonoBehaviour {
 
   public float fadeInTime = 0.01f;
+  public float fadeInWait = 0.0f;
   public float fadeOutTime = 0.01f;
   
   private float alpha_ = 0.0f;
   private float last_time_;
+  private float time_waited_ = 0.0f;
 
   void Start() {
     last_time_ = Time.time;
@@ -33,6 +35,9 @@ public class FadeInOut : MonoBehaviour {
         return;
       }
     }
+    else if (time_waited_ < fadeInWait) {
+      time_waited_ += Time.deltaTime;
+    }
     else {
       alpha_ += delta_time / fadeInTime;
       alpha_ = Mathf.Clamp(alpha_, 0, 1);
@@ -44,6 +49,11 @@ public class FadeInOut : MonoBehaviour {
         Color main_color = renderers[i].material.color;
         main_color.a = alpha_ * alpha_;
         renderers[i].material.color = main_color;
+      }
+      else if (renderers[i].material.HasProperty("_TintColor")) {
+        Color main_color = renderers[i].material.GetColor("_TintColor");
+        main_color.a = alpha_ * alpha_;
+        renderers[i].material.SetColor("_TintColor", main_color);
       }
     }
   }

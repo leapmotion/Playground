@@ -8,12 +8,16 @@ public class DisconnectionNotice : MonoBehaviour {
   public float fadeOutTime = 1.0f;
   public AnimationCurve fade;
   public int waitFrames = 10;
+  public Texture2D embeddedReplacementImage;
 
   private float fadedIn = 0.0f;
   private int frames_disconnected_ = 0;
 
   void Start() {
     SetAlpha(0.0f);
+    if (embeddedReplacementImage != null && controller.IsEmbedded()) {
+      renderer.material.mainTexture = embeddedReplacementImage;
+    }
   }
 
   void SetAlpha(float alpha) {

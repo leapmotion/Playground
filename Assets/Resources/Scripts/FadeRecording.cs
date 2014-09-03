@@ -38,6 +38,10 @@ public class FadeRecording : MonoBehaviour {
 
     float progress = controller.GetRecordingProgress();
 
+    if (progress >= 1.0f) {
+      gameObject.SetActive(false);
+    }
+
     float alpha = maxTransparency;
     if (progress < fadeInLength)
       alpha *= progress / fadeInLength;

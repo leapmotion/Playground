@@ -276,7 +276,14 @@ public class HandController : MonoBehaviour {
   }
 
   public bool IsConnected() {
-    return leap_controller_.IsConnected;
+    return leap_controller_ != null && leap_controller_.IsConnected;
+  }
+
+  public bool IsEmbedded() {
+    DeviceList devices = leap_controller_.Devices;
+    if (devices.Count == 0)
+      return false;
+    return devices[0].IsEmbedded;
   }
 
   void UpdateRecorder() {
