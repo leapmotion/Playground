@@ -12,8 +12,8 @@ using Leap;
 public class HandController : MonoBehaviour {
 
   // Reference distance from thumb base to pinky base in mm.
-  protected const float MODEL_PALM_WIDTH = 85.0f;
   protected const float GIZMO_SCALE = 5.0f;
+  protected const float MM_TO_M = 0.001f;
 
   public bool separateLeftRight = false;
   public HandModel leftGraphicsModel;
@@ -136,7 +136,7 @@ public class HandController : MonoBehaviour {
           new_hand.SetController(this);
 
           // Set scaling based on reference hand.
-          float hand_scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
+          float hand_scale = MM_TO_M * leap_hand.PalmWidth / new_hand.handModelPalmWidth;
           new_hand.transform.localScale = hand_scale * transform.localScale;
 
           new_hand.InitHand();
@@ -150,7 +150,7 @@ public class HandController : MonoBehaviour {
           hand_model.MirrorZAxis(mirrorZAxis);
 
           // Set scaling based on reference hand.
-          float hand_scale = leap_hand.PalmWidth / MODEL_PALM_WIDTH;
+          float hand_scale = MM_TO_M * leap_hand.PalmWidth / hand_model.handModelPalmWidth;
           hand_model.transform.localScale = hand_scale * transform.localScale;
           hand_model.UpdateHand();
         }
@@ -239,12 +239,6 @@ public class HandController : MonoBehaviour {
     UpdateToolModels(tools_, frame.Tools, toolModel);
   }
 
-  public HandModel[] GetAllGraphicHands() {
-    HandModel[] models = new HandModel[hand_graphics_.Count];
-    hand_graphics_.Values.CopyTo(models, 0);
-    return models;
-  }
-
   public float GetRecordingProgress() {
     return recorder_.GetProgress();
   }
@@ -276,7 +270,7 @@ public class HandController : MonoBehaviour {
   }
 
   public bool IsConnected() {
-    return leap_controller_ != null && leap_controller_.IsConnected;
+    return leap_controller_.IsConnected;
   }
 
   public bool IsEmbedded() {
@@ -284,6 +278,12 @@ public class HandController : MonoBehaviour {
     if (devices.Count == 0)
       return false;
     return devices[0].IsEmbedded;
+  }
+  
+  public HandModel[] GetAllGraphicHands() {
+    HandModel[] models = new HandModel[hand_graphics_.Count];
+    hand_graphics_.Values.CopyTo(models, 0);
+    return models;
   }
 
   void UpdateRecorder() {

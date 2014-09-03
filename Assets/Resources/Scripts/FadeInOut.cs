@@ -13,10 +13,11 @@ public class FadeInOut : MonoBehaviour {
   public float fadeInTime = 0.01f;
   public float fadeInWait = 0.0f;
   public float fadeOutTime = 0.01f;
+  public float fadeOutAfterTime = Mathf.Infinity;
   
   private float alpha_ = 0.0f;
   private float last_time_;
-  private float time_waited_ = 0.0f;
+  private float time_alive_ = 0.0f;
 
   void Start() {
     last_time_ = Time.time;
@@ -28,17 +29,16 @@ public class FadeInOut : MonoBehaviour {
     last_time_ = Time.time;
 
     Hand leap_hand = GetComponent<HandModel>().GetLeapHand();
-    if (leap_hand == null) {
+    time_alive_ += Time.deltaTime;
+    if (leap_hand == null || time_alive_ >= fadeOutAfterTime) {
       alpha_ -= delta_time / fadeOutTime;
-      if (alpha_ <= 0) {
+      alpha_ = Mathf.Clamp(alpha_, 0.0f, 1.0f);
+      if (alpha_ <= 0 && leap_hand == null) {
         Destroy(gameObject);
         return;
       }
     }
-    else if (time_waited_ < fadeInWait) {
-      time_waited_ += Time.deltaTime;
-    }
-    else {
+    else if (time_alive_ >= fadeInWait) {
       alpha_ += delta_time / fadeInTime;
       alpha_ = Mathf.Clamp(alpha_, 0, 1);
     }
