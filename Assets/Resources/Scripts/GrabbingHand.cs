@@ -22,6 +22,7 @@ public class GrabbingHand : MonoBehaviour {
   public float positionFiltering = 0.4f;
   public float minConfidence = 0.3f;
   public float maxVelocity = 0.3f;
+  public LayerMask grabbableLayers;
 
   public Vector3 maxMovement = new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
   public Vector3 minMovement = new Vector3(-Mathf.Infinity, -Mathf.Infinity, -Mathf.Infinity);
@@ -62,7 +63,7 @@ public class GrabbingHand : MonoBehaviour {
     releasing_ = false;
 
     // Check if we pinched a movable object and grab the closest one that's not part of the hand.
-    Collider[] close_things = Physics.OverlapSphere(pinch_position, grabDistance);
+    Collider[] close_things = Physics.OverlapSphere(pinch_position, grabDistance, grabbableLayers);
     Vector3 distance = new Vector3(grabDistance, 0.0f, 0.0f);
 
     HandModel hand_model = GetComponent<HandModel>();

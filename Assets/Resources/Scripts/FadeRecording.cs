@@ -15,12 +15,28 @@ public class FadeRecording : MonoBehaviour {
   public float fadeOutLength = 0.01f;
   public float maxTransparency = 0.5f;
 
+  public Renderer[] additionalObjects;
+
   private bool played = false;
   
   void Start() {
     HandController controller = GetComponent<HandController>();
     controller.enabled = false;
     controller.PauseRecording();
+  }
+
+  void SetAlphaOfRenderer(Renderer rend, float alpha) {
+    if (rend.material.HasProperty("_Color")) {
+      Color new_color = rend.material.color;
+      new_color.a = alpha;
+      rend.material.color = new_color;
+    }
+    if (rend.material.HasProperty("_TintColor")) {
+      Color new_color = rend.material.GetColor("_TintColor");
+      new_color.a = alpha;
+      rend.material.SetColor("_TintColor", new_color);
+    }
+
   }
 
   void Update() {
@@ -39,7 +55,10 @@ public class FadeRecording : MonoBehaviour {
 
     if (progress >= 1.0f) {
       controller.DestroyAllHands();
+      for (int i = 0; i < additionalObjects.Length; ++i)
+        Destroy(additionalObjects[i].gameObject);
       gameObject.SetActive(false);
+      return;
     }
 
     float alpha = maxTransparency;
@@ -51,18 +70,10 @@ public class FadeRecording : MonoBehaviour {
     HandModel[] hands = controller.GetAllGraphicHands();
     foreach (HandModel hand in hands) {
       Renderer[] renderers = hand.GetComponentsInChildren<Renderer>();
-      for (int i = 0; i < renderers.Length; ++i) {
-        if (renderers[i].material.HasProperty("_Color")) {
-          Color new_color = renderers[i].material.color;
-          new_color.a = alpha;
-          renderers[i].material.color = new_color;
-        }
-        if (renderers[i].material.HasProperty("_TintColor")) {
-          Color new_color = renderers[i].material.GetColor("_TintColor");
-          new_color.a = alpha;
-          renderers[i].material.SetColor("_TintColor", new_color);
-        }
-      }
+      for (int i = 0; i < renderers.Length; ++i)
+        SetAlphaOfRenderer(renderers[i], alpha);
+      for (int i = 0; i < additionalObjects.Length; ++i)
+        SetAlphaOfRenderer(additionalObjects[i], alpha);
     }
   }
 }
