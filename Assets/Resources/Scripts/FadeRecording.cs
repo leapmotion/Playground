@@ -14,7 +14,6 @@ public class FadeRecording : MonoBehaviour {
   public float fadeInLength = 0.01f;
   public float fadeOutLength = 0.01f;
   public float maxTransparency = 0.5f;
-  public Material material;
 
   private bool played = false;
   
@@ -39,6 +38,7 @@ public class FadeRecording : MonoBehaviour {
     float progress = controller.GetRecordingProgress();
 
     if (progress >= 1.0f) {
+      controller.DestroyAllHands();
       gameObject.SetActive(false);
     }
 
@@ -52,9 +52,16 @@ public class FadeRecording : MonoBehaviour {
     foreach (HandModel hand in hands) {
       Renderer[] renderers = hand.GetComponentsInChildren<Renderer>();
       for (int i = 0; i < renderers.Length; ++i) {
-        Color new_color = renderers[i].material.color;
-        new_color.a = alpha;
-        renderers[i].material.color = new_color;
+        if (renderers[i].material.HasProperty("_Color")) {
+          Color new_color = renderers[i].material.color;
+          new_color.a = alpha;
+          renderers[i].material.color = new_color;
+        }
+        if (renderers[i].material.HasProperty("_TintColor")) {
+          Color new_color = renderers[i].material.GetColor("_TintColor");
+          new_color.a = alpha;
+          renderers[i].material.SetColor("_TintColor", new_color);
+        }
       }
     }
   }

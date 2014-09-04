@@ -11,6 +11,7 @@ public class FadeInOutAudio : MonoBehaviour {
   private bool fading_out_ = false;
   private float start_fade_volume_;
   private float start_fade_time_;
+  private float time_alive_ = 0.0f;
 
   void Start() {
     SetVolume(0.0f);
@@ -23,17 +24,17 @@ public class FadeInOutAudio : MonoBehaviour {
   public void FadeOut() {
     fading_out_ = true;
     start_fade_volume_ = GetComponent<AudioSource>().volume;
-    start_fade_time_ = Time.timeSinceLevelLoad;
+    start_fade_time_ = time_alive_;
   }
 
   void Update() {
-    float time = Time.timeSinceLevelLoad;
+    time_alive_ += Time.deltaTime;
     if (fading_out_) {
-      float t = (Time.timeSinceLevelLoad - start_fade_time_) / fadeOutTime;
+      float t = (time_alive_ - start_fade_time_) / fadeOutTime;
       SetVolume(start_fade_volume_ * (1.0f - fadeCurve.Evaluate(t)));
     }
-    else if (time < fadeInTime)
-      SetVolume(maxVolume * fadeCurve.Evaluate(time / fadeInTime));
+    else if (time_alive_ < fadeInTime)
+      SetVolume(maxVolume * fadeCurve.Evaluate(time_alive_ / fadeInTime));
 
   }
 }

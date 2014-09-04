@@ -13,6 +13,8 @@ public class PedalMesh : MonoBehaviour {
   public Collider firstSegment;
   public Collider lastSegment;
   public AnimationCurve flowerCurve;
+  public AnimationCurve morphCurve;
+  public float morph = 0.0f;
 
   private Vector3[] vertices_;
   private Mesh front_;
@@ -88,7 +90,8 @@ public class PedalMesh : MonoBehaviour {
   private void UpdateMesh() {
     for (int v = 0; v < numVertices / 2; ++v) {
       float phase = (2.0f * v) / (numVertices - 2);
-      float width = flowerCurve.Evaluate(phase);
+      float flower_width = flowerCurve.Evaluate(phase);
+      float width = flower_width + morph * (morphCurve.Evaluate(phase) - flower_width);
 
       Vector3 vertex1 = new Vector3(2.0f * phase - 1, 0, -width);
       Vector3 vertex1_a = firstSegment.transform.TransformPoint(vertex1);

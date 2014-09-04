@@ -18,18 +18,20 @@ public class PressAnyKeyToContinue : MonoBehaviour {
   public float maxAlpha = 0.5f;
   public FadeInOutAudio[] audioFaders;
   public FadeInOutMaterial[] materialFaders;
+  public HandController controller;
 
   private bool showing_ = false;
   private float show_start_time_;
   private bool pressed = false;
   private float time_since_pressed_ = 0.0f;
+  private float time_connected_ = 0.0f;
 
   void Start() {
     SetTextAlpha(0.0f);
   }
 
 	void OnGUI() {
-    if (Event.current.type == EventType.KeyDown && Time.timeSinceLevelLoad >= enableWaitTime) {
+    if (Event.current.type == EventType.KeyDown && time_connected_ >= enableWaitTime) {
       pressed = true;
       foreach (FadeInOutMaterial material_fader in materialFaders) {
         material_fader.FadeOut();
@@ -61,6 +63,11 @@ public class PressAnyKeyToContinue : MonoBehaviour {
   }
 
   void Update() {
+    if (controller.IsConnected())
+      time_connected_ += Time.deltaTime;
+    else
+      time_connected_ = 0.0f;
+
     SetBlackAlpha(1.0f - fadeCurve.Evaluate(Time.timeSinceLevelLoad / fadeInTime));
     if (showing_) {
       float time = Time.timeSinceLevelLoad - show_start_time_;

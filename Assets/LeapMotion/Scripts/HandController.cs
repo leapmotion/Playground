@@ -279,8 +279,22 @@ public class HandController : MonoBehaviour {
       return false;
     return devices[0].IsEmbedded;
   }
+
+  public void DestroyAllHands() {
+    if (hand_graphics_ != null) {
+      foreach (HandModel model in hand_graphics_.Values)
+        Destroy(model.gameObject);
+    }
+    if (hand_physics_ != null) {
+      foreach (HandModel model in hand_physics_.Values)
+        Destroy(model.gameObject);
+    }
+  }
   
   public HandModel[] GetAllGraphicHands() {
+    if (hand_graphics_ == null)
+      return new HandModel[0];
+
     HandModel[] models = new HandModel[hand_graphics_.Count];
     hand_graphics_.Values.CopyTo(models, 0);
     return models;
