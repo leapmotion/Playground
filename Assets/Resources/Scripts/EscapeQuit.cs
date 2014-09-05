@@ -9,7 +9,7 @@ using System.Collections;
 
 public class EscapeQuit : MonoBehaviour {
 
-	void Update() {
+  void Update() {
     if (Input.GetKeyDown(KeyCode.Escape))
       Application.Quit();
   }

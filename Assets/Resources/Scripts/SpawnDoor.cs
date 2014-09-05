@@ -3,6 +3,13 @@ using System.Collections;
 
 public class SpawnDoor : MonoBehaviour {
 
+  enum DoorState {
+    kClosed,
+    kOpening,
+    kOpen,
+    kClosing
+  };
+
   public GameObject spawn;
   public GameObject door;
   public Vector3 startSpawnPoint = Vector3.forward;
@@ -11,6 +18,9 @@ public class SpawnDoor : MonoBehaviour {
   public float doorOpenTime = 0.5f;
   public float doorCloseTime = 0.5f;
 
+  public AudioClip openingSound;
+  public AudioClip closingSound;
+
   public AnimationCurve openCurve;
   public AnimationCurve closeCurve;
   public AnimationCurve spawnCurve;
@@ -18,6 +28,7 @@ public class SpawnDoor : MonoBehaviour {
   private GameObject current_spawn_;
   private float spawn_time_ = 0.0f;
   private int num_spawns_ = 0;
+  private DoorState door_state_ = DoorState.kClosed;
 
   void Start() {
     SetDoorOpenness(0);
@@ -66,17 +77,26 @@ public class SpawnDoor : MonoBehaviour {
 
   void Update() {
     if (spawn_time_ <= doorOpenTime) {
+      if (door_state_ == DoorState.kClosed)
+        audio.PlayOneShot(openingSound);
+      door_state_ = DoorState.kOpening;
       SetDoorOpenness(openCurve.Evaluate(spawn_time_ / doorOpenTime));
     }
     else if (spawn_time_ < spawnTime - doorCloseTime) {
       if (current_spawn_ == null)
         Spawn();
+      door_state_ = DoorState.kOpen;
     }
     else if (spawn_time_ < spawnTime) {
+      if (door_state_ == DoorState.kOpen)
+        audio.PlayOneShot(closingSound);
+      door_state_ = DoorState.kClosing;
+
       float t = (spawn_time_ + doorCloseTime - spawnTime) / doorCloseTime;
       SetDoorOpenness(closeCurve.Evaluate(t));
     }
     else {
+      door_state_ = DoorState.kClosed;
       if (current_spawn_ != null) {
         ActivateSpawn();
       }

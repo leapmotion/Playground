@@ -13,7 +13,7 @@ public class PressAnyKeyToContinue : MonoBehaviour {
   public float textFadeTime = 1.0f;
   public float fadeInTime = 2.0f;
   public float fadeOutTime = 2.0f;
-  public Renderer blackFade;
+  public GUITexture blackFade;
   public AnimationCurve fadeCurve;
   public float maxAlpha = 0.5f;
   public FadeInOutAudio[] audioFaders;
@@ -57,9 +57,7 @@ public class PressAnyKeyToContinue : MonoBehaviour {
   }
 
   void SetBlackAlpha(float alpha) {
-    Color color = blackFade.material.color;
-    color.a = alpha;
-    blackFade.material.color = color;
+    blackFade.color = Color.Lerp(Color.clear, Color.black, alpha);
   }
 
   void Update() {
@@ -68,7 +66,7 @@ public class PressAnyKeyToContinue : MonoBehaviour {
     else
       time_connected_ = 0.0f;
 
-    SetBlackAlpha(1.0f - fadeCurve.Evaluate(Time.timeSinceLevelLoad / fadeInTime));
+    SetBlackAlpha(fadeCurve.Evaluate(1.0f - Time.timeSinceLevelLoad / fadeInTime));
     if (showing_) {
       float time = Time.timeSinceLevelLoad - show_start_time_;
       SetTextAlpha(fadeCurve.Evaluate(time / textFadeTime));

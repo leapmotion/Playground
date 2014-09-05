@@ -86,13 +86,19 @@ public class AerodynamicLeaf : MonoBehaviour {
     delta_current.y = 0;
     rigidbody.AddForce(waterCurrentForce * delta_current);
   }
+  
+  float UnitsAboveWater() {
+    return transform.position.y - waterHeight;
+  }
+
+  public bool TouchingWater() {
+    return UnitsAboveWater() < 0;
+  }
 
   void FixedUpdate() {
-    float distanceFromSurface = transform.position.y - waterHeight;
-
-    if (distanceFromSurface >= 0)
-      AirUpdate();
+    if (TouchingWater())
+      WaterUpdate(UnitsAboveWater());
     else
-      WaterUpdate(distanceFromSurface);
+      AirUpdate();
   }
 }

@@ -12,9 +12,9 @@ public class Rotate : MonoBehaviour {
   public Vector3 rotateVector;
   public float degreesPerSecond;
 
-	void Update () {
+  void Update () {
     float angle = Time.deltaTime * degreesPerSecond;
     Vector3 vector = rotateVector;
     transform.rotation = transform.rotation * Quaternion.AngleAxis(angle, vector);
-	}
+  }
 }

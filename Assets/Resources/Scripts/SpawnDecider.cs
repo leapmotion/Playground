@@ -6,6 +6,9 @@ public class SpawnDecider : MonoBehaviour {
   public float firstSpawnTime = 8.0f;
   public RobotHead[] heads;
   public int maxSpawns = 4;
+  public float waitToSpawnNext = 1.0f;
+
+  private float spawn_charge_ = 0.0f;
 
   void Update() {
     int num_attached = 0;
@@ -19,7 +22,12 @@ public class SpawnDecider : MonoBehaviour {
         Time.timeSinceLevelLoad >= firstSpawnTime && 
         !door.IsSpawning() &&
         door.GetNumSpawns() < maxSpawns) {
-      door.StartSpawn();
+      spawn_charge_ += Time.deltaTime;
+
+      if (spawn_charge_ >= waitToSpawnNext)
+        door.StartSpawn();
     }
+    else
+      spawn_charge_ = 0.0f;
   }
 }

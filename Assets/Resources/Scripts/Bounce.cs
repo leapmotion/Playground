@@ -19,7 +19,7 @@ public class Bounce : MonoBehaviour {
     startPosition = transform.position;
   }
 
-	void Update () {
+  void Update () {
     bounces += Time.deltaTime * bouncesPerSecond;
-	}
+  }
 }

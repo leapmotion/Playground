@@ -9,6 +9,7 @@ public class DisconnectionNotice : MonoBehaviour {
   public AnimationCurve fade;
   public int waitFrames = 10;
   public Texture2D embeddedReplacementImage;
+  public Color onColor = Color.white;
 
   private float fadedIn = 0.0f;
   private int frames_disconnected_ = 0;
@@ -18,9 +19,7 @@ public class DisconnectionNotice : MonoBehaviour {
   }
 
   void SetAlpha(float alpha) {
-    Color color = renderer.material.color;
-    color.a = alpha;
-    renderer.material.color = color;
+    guiTexture.color = Color.Lerp(Color.clear, onColor, alpha);
   }
 
   void Update() {

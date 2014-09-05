@@ -20,7 +20,7 @@ public class PressAnyLocalization : MonoBehaviour {
   public string portuguese;
   public string spanish;
 
-	public void Start() {
+  public void Start() {
     GUIText text = GetComponent<GUIText>();
 
     switch (Application.systemLanguage) {

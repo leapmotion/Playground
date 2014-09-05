@@ -28,7 +28,7 @@ public class EnergyGyro : MonoBehaviour {
   private float charge_level_ = 0.0f;
   private bool charged = false;
 
-	void Update () {
+  void Update () {
     for (int i = 0; i < gimbals.Length; ++i) {
       float degreesPerSecond = startSpeeds[i] + charge_level_ * (endSpeeds[i] - startSpeeds[i]);
       gimbals[i].degreesPerSecond = degreesPerSecond;
@@ -68,7 +68,7 @@ public class EnergyGyro : MonoBehaviour {
         start_tiling_ = rings[0].material.GetTextureScale("_MainTex")[1];
       }
     }
-	}
+  }
 
   public void Zap(float amount) {
     charge_level_ += amount;

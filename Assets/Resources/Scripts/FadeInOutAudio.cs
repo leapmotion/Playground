@@ -7,6 +7,7 @@ public class FadeInOutAudio : MonoBehaviour {
   public float fadeOutTime = 1.0f;
   public float maxVolume = 1.0f;
   public AnimationCurve fadeCurve;
+  public bool onlyPlayIfFirstStage = false;
 
   private bool fading_out_ = false;
   private float start_fade_volume_;
@@ -14,6 +15,8 @@ public class FadeInOutAudio : MonoBehaviour {
   private float time_alive_ = 0.0f;
 
   void Start() {
+    if (onlyPlayIfFirstStage && Application.loadedLevel > 0)
+      enabled = false;
     SetVolume(0.0f);
   }
 

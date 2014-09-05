@@ -11,7 +11,7 @@ public class FrameRateSetter : MonoBehaviour {
 
   public int frameRate = 60;
 
-	public void Awake() {
+  public void Awake() {
     Application.targetFrameRate = frameRate;
   }
 }

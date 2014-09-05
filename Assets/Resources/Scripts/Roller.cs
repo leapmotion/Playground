@@ -13,16 +13,16 @@ public class Roller : MonoBehaviour {
   public float restingDistance = -5.226256f;
   public float recoveringDistance = -2.0f;
 
-	void Start () {
+  void Start () {
     rigidbody.maxAngularVelocity = maxAngularVelocity;
     Physics.IgnoreCollision(collider, upright.collider, true);
-	}
+  }
 
   public bool IsUpright() {
     return upright.IsUpright();
   }
-	
-	void FixedUpdate () {
+  
+  void FixedUpdate () {
     if (upright.IsUpright()) {
       float rotation_angle = 0;
       Vector3 rotation_axis;
@@ -41,5 +41,5 @@ public class Roller : MonoBehaviour {
           velocityForceScale * velocity_rotation;
       rigidbody.AddTorque(force * Time.deltaTime * 50);
     }
-	}
+  }
 }

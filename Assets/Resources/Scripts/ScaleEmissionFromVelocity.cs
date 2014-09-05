@@ -9,16 +9,16 @@ public class ScaleEmissionFromVelocity : MonoBehaviour {
 
   private Vector3 last_position = Vector3.zero;
 
-	void Start () {
+  void Start () {
     particleSystem.emissionRate = 0.0f;
-	}
-	
-	void Update () {
+  }
+
+  void Update () {
     if (last_position == Vector3.zero)
       last_position = transform.position;
 
     float speed = (transform.position - last_position).magnitude / Time.deltaTime;
     particleSystem.emissionRate = (speed - startEmittingSpeed) * ratePerUnitPerSecond;
     last_position = transform.position;
-	}
+  }
 }

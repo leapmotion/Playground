@@ -8,9 +8,7 @@ using UnityEngine;
 using System.Collections;
 
 public class SetFullscreen : MonoBehaviour {
-
-	void Start() {
+  void Start() {
     Screen.fullScreen = true;
   }
 }
-

@@ -9,7 +9,7 @@ using System.Collections;
 
 public class LevelSelector : MonoBehaviour {
 
-	public void Update() {
+  public void Update() {
     if (Input.GetKeyDown("1"))
       Application.LoadLevel(0);
     else if (Input.GetKeyDown("2"))
