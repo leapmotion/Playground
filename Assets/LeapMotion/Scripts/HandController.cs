@@ -23,6 +23,7 @@ public class HandController : MonoBehaviour {
 
   public ToolModel toolModel;
 
+  public bool isHeadMounted = false;
   public bool mirrorZAxis = false;
 
   // If hands are in charge of Destroying themselves, make this false.
@@ -51,9 +52,20 @@ public class HandController : MonoBehaviour {
 
   void Awake() {
     leap_controller_ = new Controller();
+
+    // Optimize for top-down tracking if on head mounted display.
+    Controller.PolicyFlag policy_flags = leap_controller_.PolicyFlags;
+    if (isHeadMounted)
+      policy_flags |= Controller.PolicyFlag.POLICY_OPTIMIZE_HMD;
+    else
+      policy_flags &= ~Controller.PolicyFlag.POLICY_OPTIMIZE_HMD;
+
+    leap_controller_.SetPolicyFlags(policy_flags);
+
   }
 
   void Start() {
+    // Initialize hand lookup tables.
     hand_graphics_ = new Dictionary<int, HandModel>();
     hand_physics_ = new Dictionary<int, HandModel>();
 
