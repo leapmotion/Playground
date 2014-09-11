@@ -14,17 +14,14 @@ public class FlowerBloom : MonoBehaviour {
   public float closeAngle = 100;
   public float openTime = 1.0f;
   public float closeTime = 1.0f;
+  public bool open = false;
 
   public HingeJoint[] pedals;
 
-  private bool opening_ = true;
   private float phase_ = 1.0f;
 
   void Update() {
-    if (Input.GetKeyDown("f"))
-      opening_ = !opening_;
-
-    if (opening_)
+    if (open)
       phase_ += Time.deltaTime / openTime;
     else
       phase_ -= Time.deltaTime / closeTime;

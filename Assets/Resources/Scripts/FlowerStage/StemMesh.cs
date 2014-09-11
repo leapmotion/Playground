@@ -13,13 +13,15 @@ public class StemMesh : MonoBehaviour {
   const int VERTICES_PER_QUAD = 4;
 
   public Collider[] segments;
-  public int sides = 6;
+  public int sides = 4;
   public AnimationCurve stemCurve;
-  public float growthRate = 1.0f;
   public float growthProgress = 0.0f;
+  public float stumpDiminishTime = 2.0f;
 
   private Vector3[] vertices_;
   private bool[] broken;
+  private float stump_width_ = 1.0f;
+  private bool is_diminishing_ = false;
 
   void Start () {
     broken = new bool[segments.Length];
@@ -35,8 +37,24 @@ public class StemMesh : MonoBehaviour {
     MeshFilter filter = GetComponent<MeshFilter>();
 
     filter.mesh.vertices = vertices_;
-    filter.mesh.RecalculateNormals();
     filter.mesh.RecalculateBounds();
+    filter.mesh.RecalculateNormals();
+  }
+
+  public bool IsBroken() {
+    for (int i = 0; i < broken.Length; ++i) {
+      if (broken[i])
+        return true;
+    }
+    return false;
+  }
+
+  public bool IsStumpClear() {
+    return stump_width_ == 0.0f;
+  }
+
+  public void RemoveStump() {
+    is_diminishing_ = true;
   }
 
   private void InitMesh() {
@@ -89,7 +107,19 @@ public class StemMesh : MonoBehaviour {
     }
   }
 
+  private void KillStump() {
+    for (int i = 0; i < broken.Length && !broken[i]; ++i)
+      segments[i].collider.enabled = false;
+  }
+
   private void UpdateMesh() {
+    if (is_diminishing_ && stump_width_ != 0.0f) {
+      stump_width_ -= Time.deltaTime / stumpDiminishTime;
+      stump_width_ = Mathf.Clamp(stump_width_, 0.0f, 1.0f);
+      if (stump_width_ == 0.0f)
+        KillStump();
+    }
+
     for (int i = 0; i < segments.Length; ++i) {
       if (!broken[i] && segments[i].GetComponent<HingeJoint>() == null) {
         InitMesh();
@@ -97,14 +127,18 @@ public class StemMesh : MonoBehaviour {
       }
     }
 
-    growthProgress = Mathf.Clamp(growthProgress + Time.deltaTime * growthRate, 0.0f, 1.0f);
-
     int vertex_index = 0;
     float angle = 360.0f / sides;
 
+    bool is_stump = true;
     for (int i = 0; i < segments.Length; ++i) {
       float phase = (1.0f * i) / (segments.Length - 1);
       float width = Mathf.Clamp(segments.Length * growthProgress - i, 0.0f, 1.0f);
+
+      if (is_stump)
+        width *= stump_width_;
+      is_stump = is_stump && !broken[i];
+
       Vector3 offset = new Vector3(width * stemCurve.Evaluate(phase), 0, 0);
 
       for (int side = 0; side < sides; ++side) {

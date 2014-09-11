@@ -18,9 +18,12 @@ public class FishForce : MonoBehaviour {
   public Vector3 swimCenter = Vector3.zero;
   public float swimCircleRadius = 1.0f;
   public float swimCircleFrequency = 0.3f;
+  public float swimOuterCircleRadius = 1.0f;
+  public float swimOuterCircleFrequency = 0.3f;
   public float swimStartAngle = 0.0f;
 
   private float current_morph_ = 0.0f;
+  private bool is_fish_ = false;
 
   // Grabble grabble grabble..
   bool IsGrabbed() {
@@ -35,6 +38,10 @@ public class FishForce : MonoBehaviour {
 
   bool IsAttached() {
     return expectedJoints == GetComponentsInChildren<Joint>().Length;
+  }
+
+  public bool IsFish() {
+    return is_fish_;
   }
 
   bool IsTouchingWater() {
@@ -58,15 +65,20 @@ public class FishForce : MonoBehaviour {
       current_morph_ -= Time.deltaTime / morphTime;
 
     current_morph_ = Mathf.Clamp(current_morph_, 0.0f, 1.0f);
-    GetComponent<PedalMesh>().morph = morphTransition.Evaluate(current_morph_);
+    GetComponent<PetalMesh>().morph = morphTransition.Evaluate(current_morph_);
+    is_fish_ = current_morph_ >= 0.5f;
   }
 
   void FixedUpdate() {
     float fish_amount = 2.0f * (current_morph_ - 0.5f);
     if (fish_amount > 0.0f && ShouldBeFish()) {
       float swimAngle = swimStartAngle + 180 * swimCircleFrequency * Time.timeSinceLevelLoad;
+      float swimOuterAngle = swimStartAngle +
+                             180 * swimOuterCircleFrequency * Time.timeSinceLevelLoad;
       Vector3 offset = Quaternion.AngleAxis(swimAngle, Vector3.up) * Vector3.right;
-      Vector3 swimTarget = swimCenter + swimCircleRadius * offset;
+      Vector3 outerOffset = Quaternion.AngleAxis(swimOuterAngle, Vector3.up) * Vector3.right;
+      Vector3 swimTarget = swimCenter + swimOuterCircleRadius * outerOffset +
+                           swimCircleRadius * offset;
       Vector3 delta = swimTarget - fishFront.transform.position;
       fishFront.AddForce(swimForce * fish_amount * delta.normalized * Time.deltaTime);
     }

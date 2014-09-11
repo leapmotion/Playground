@@ -9,15 +9,27 @@ public class FadeInOutAudio : MonoBehaviour {
   public AnimationCurve fadeCurve;
   public bool onlyPlayIfFirstStage = false;
 
+  public int activeStages = 1;
+
   private bool fading_out_ = false;
   private float start_fade_volume_;
   private float start_fade_time_;
   private float time_alive_ = 0.0f;
+  private int start_stage_ = 0;
 
   void Start() {
     if (onlyPlayIfFirstStage && Application.loadedLevel > 0)
       enabled = false;
     SetVolume(0.0f);
+    start_stage_ = Application.loadedLevel;
+  }
+
+  void OnEnable() {
+    PressAnyKeyToContinue.OnContinue += FadeOut;
+  }
+
+  void OnDisable() {
+    PressAnyKeyToContinue.OnContinue -= FadeOut;
   }
 
   void SetVolume(float volume) {
@@ -25,9 +37,11 @@ public class FadeInOutAudio : MonoBehaviour {
   }
 
   public void FadeOut() {
-    fading_out_ = true;
-    start_fade_volume_ = GetComponent<AudioSource>().volume;
-    start_fade_time_ = time_alive_;
+    if (Application.loadedLevel >= activeStages + start_stage_ - 1) {
+      fading_out_ = true;
+      start_fade_volume_ = GetComponent<AudioSource>().volume;
+      start_fade_time_ = time_alive_;
+    }
   }
 
   void Update() {
