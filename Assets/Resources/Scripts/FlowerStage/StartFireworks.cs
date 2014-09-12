@@ -3,12 +3,16 @@ using System.Collections;
 
 public class StartFireworks : MonoBehaviour {
 
-  void Update () {
-    if (Input.GetKeyDown("s")) {
-      ParticleSystem fireworks = GetComponent<ParticleSystem>();
-      if (fireworks != null)
-        fireworks.Play();
-    }
+  void OnEnable() {
+    PressAnyKeyToContinue.OnContinue += PlayFireworks;
+  }
 
+  void OnDisable() {
+    PressAnyKeyToContinue.OnContinue -= PlayFireworks;
+  }
+
+  void PlayFireworks() {
+    ParticleSystem fireworks = GetComponent<ParticleSystem>();
+    fireworks.Play();
   }
 }

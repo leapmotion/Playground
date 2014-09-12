@@ -7,7 +7,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class PressAnyLocalization : MonoBehaviour {
+public class Localization : MonoBehaviour {
 
   public string english;
   public string chineseSimplified;

@@ -28,8 +28,11 @@ public class StemMesh : MonoBehaviour {
     for (int i = 0; i < broken.Length; ++i)
       broken[i] = false;
 
-    GetComponent<MeshFilter>().mesh = new Mesh();
+    MeshFilter filter = GetComponent<MeshFilter>();
+    filter.mesh = new Mesh();
     InitMesh();
+    filter.mesh.RecalculateBounds();
+    filter.mesh.RecalculateNormals();
   }
 
   void Update () {
@@ -135,9 +138,9 @@ public class StemMesh : MonoBehaviour {
       float phase = (1.0f * i) / (segments.Length - 1);
       float width = Mathf.Clamp(segments.Length * growthProgress - i, 0.0f, 1.0f);
 
+      is_stump = is_stump && !broken[i];
       if (is_stump)
         width *= stump_width_;
-      is_stump = is_stump && !broken[i];
 
       Vector3 offset = new Vector3(width * stemCurve.Evaluate(phase), 0, 0);
 

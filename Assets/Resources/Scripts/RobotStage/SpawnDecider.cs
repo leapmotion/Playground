@@ -9,23 +9,42 @@ public class SpawnDecider : MonoBehaviour {
   public float waitToSpawnNext = 1.0f;
 
   private float spawn_charge_ = 0.0f;
+  private int num_attached_ = 0;
+
+  void OnEnable() {
+    RobotHead.OnBootUp += IncrementAttached;
+    RobotHead.OnShutDown += DecrementAttached;
+  }
+
+  void OnDisable() {
+    RobotHead.OnBootUp -= IncrementAttached;
+    RobotHead.OnShutDown -= DecrementAttached;
+  }
+
+  void DecrementAttached() {
+    num_attached_--;
+    if (num_attached_ < 0)
+      num_attached_ = 0;
+  }
+
+  void IncrementAttached() {
+    num_attached_++;
+  }
+
+  bool ShouldSpawn() {
+    SpawnDoor door = GetComponent<SpawnDoor>();
+    return num_attached_ >= door.GetNumSpawns() &&
+           Time.timeSinceLevelLoad >= firstSpawnTime && 
+           !door.IsSpawning() &&
+           door.GetNumSpawns() < maxSpawns;
+  }
 
   void Update() {
-    int num_attached = 0;
-    foreach (RobotHead head in heads) {
-      if (head.GetBody() != null)
-        num_attached++;
-    }
-
-    SpawnDoor door = GetComponent<SpawnDoor>();
-    if (num_attached >= door.GetNumSpawns() &&
-        Time.timeSinceLevelLoad >= firstSpawnTime && 
-        !door.IsSpawning() &&
-        door.GetNumSpawns() < maxSpawns) {
+    if (ShouldSpawn()) {
       spawn_charge_ += Time.deltaTime;
 
       if (spawn_charge_ >= waitToSpawnNext)
-        door.StartSpawn();
+        GetComponent<SpawnDoor>().StartSpawn();
     }
     else
       spawn_charge_ = 0.0f;

@@ -93,6 +93,15 @@ public class FlowerGrower : MonoBehaviour {
   public bool IsBroken() {
     return stem.IsBroken();
   }
+  
+  public bool IsGrabbed() {
+    GrabbableObject[] grabbables = GetComponentsInChildren<GrabbableObject>();
+    foreach (GrabbableObject grabbable in grabbables) {
+      if (grabbable.IsGrabbed())
+        return true;
+    }
+    return false;
+  }
 
   void Update() {
     if (dieing_)

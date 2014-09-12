@@ -9,6 +9,12 @@ public class RobotHead : MonoBehaviour {
   public AudioClip bootUpNoise;
   public AudioClip shutDownNoise;
 
+  public delegate void NotifyBootUp();
+  public static event NotifyBootUp OnBootUp;
+
+  public delegate void NotifyShutDown();
+  public static event NotifyShutDown OnShutDown;
+
   protected void SetFaceAlpha(float alpha) {
     if (face == null)
       return;
@@ -23,10 +29,12 @@ public class RobotHead : MonoBehaviour {
 
   public virtual void BootUp() {
     audio.PlayOneShot(bootUpNoise, 10.0f);
+    OnBootUp();
   }
 
   public virtual void ShutDown() {
     audio.PlayOneShot(shutDownNoise, 10.0f);
+    OnShutDown();
   }
 
   public void SetBody(RobotBody body) {

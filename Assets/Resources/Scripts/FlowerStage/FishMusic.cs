@@ -3,7 +3,9 @@ using System.Collections;
 
 public class FishMusic : MonoBehaviour {
 
-  public FishForce[] fishies;
+  public int minFishForMusic = 2;
+  public int maxFishForMusic = 7;
+
   private int current_number_of_fish_ = 0;
 
   public delegate void NotifyMoreFish();
@@ -18,6 +20,8 @@ public class FishMusic : MonoBehaviour {
   }
 
   float PercentFish() {
+    FishForce[] fishies = FindObjectsOfType<FishForce>();
+
     int num_fish = 0;
     foreach (FishForce fish in fishies) {
       if (fish.IsFish())
@@ -27,7 +31,7 @@ public class FishMusic : MonoBehaviour {
       OnMoreFish();
 
     current_number_of_fish_ = num_fish;
-    return (1.0f * num_fish) / fishies.Length;
+    return Mathf.Clamp((1.0f * (num_fish - minFishForMusic)) / maxFishForMusic, 0.0f, 1.0f);
   }
 
   void Update() {
