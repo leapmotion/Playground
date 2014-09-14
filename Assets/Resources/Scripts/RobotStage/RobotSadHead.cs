@@ -8,18 +8,18 @@ public class RobotSadHead : RobotHead {
   public float rainDelay = 3.0f;
   public float cloudHeight = 0.8f;
   public float cloudSpeed = 0.02f;
-  public float danceFrequency = 1.0f;
+  public AudioSource beatSource;
+  public float dancesPerLoop = 1.0f;
   public float danceForce = 1.0f;
   public float maxArmBend = 100.0f;
 
   private float time_alive_ = 0.0f;
-  private int dance_moves_ = 0;
+  private float last_dance_phase_ = 0.0f;
 
   void Start() {
     cloud.Stop();
     rain.Stop();
     SetFaceAlpha(0.0f);
-    dance_moves_ = 0;
   }
 
   public override void BootUp() {
@@ -34,7 +34,6 @@ public class RobotSadHead : RobotHead {
     cloud.Stop();
     rain.Stop();
     SetFaceAlpha(0.0f);
-    dance_moves_ = 0;
     if (GetBody() != null) {
       foreach (HingeJoint arm_joint in GetBody().armJoints) {
         arm_joint.useSpring = false;
@@ -57,11 +56,12 @@ public class RobotSadHead : RobotHead {
     rain.rigidbody.velocity = cloudSpeed * (transform.position + cloudHeight * Vector3.up -
                                             rain.transform.position) / Time.deltaTime;
 
-    int dances = (int)(time_alive_ * danceFrequency);
-    if (dances > dance_moves_) {
-      dance_moves_ = dances;
+    float progress = (1.0f * beatSource.timeSamples) / beatSource.clip.samples;
+    float dance_phase = dancesPerLoop * progress;
+    dance_phase -= (int)dance_phase;
+
+    if (last_dance_phase_ > dance_phase) {
       foreach (HingeJoint arm_joint in GetBody().armJoints) {
-        dance_moves_ = dances;
         arm_joint.useSpring = true;
         JointSpring arm_spring = arm_joint.spring;
         arm_spring.spring = danceForce;
@@ -69,5 +69,6 @@ public class RobotSadHead : RobotHead {
         arm_joint.spring = arm_spring;
       }
     }
+    last_dance_phase_ = dance_phase;
   }
 }

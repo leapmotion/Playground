@@ -3,7 +3,9 @@ using System.Collections;
 
 public class FadeInOutAudio : MonoBehaviour {
 
+  public float fadeInWaitTime = 0.0f;
   public float fadeInTime = 1.0f;
+  public float fadeOutWaitTime = 0.0f;
   public float fadeOutTime = 1.0f;
   public float maxVolume = 1.0f;
   public AnimationCurve fadeCurve;
@@ -11,11 +13,10 @@ public class FadeInOutAudio : MonoBehaviour {
 
   public int activeStages = 1;
 
+  private float progress_ = 0.0f;
   private bool fading_out_ = false;
-  private float start_fade_volume_;
-  private float start_fade_time_;
-  private float time_alive_ = 0.0f;
   private int start_stage_ = 0;
+  private float time_since_fade_out_ = 0.0f;
 
   void Start() {
     if (onlyPlayIfFirstStage && Application.loadedLevel > 0)
@@ -25,11 +26,11 @@ public class FadeInOutAudio : MonoBehaviour {
   }
 
   void OnEnable() {
-    PressAnyKeyToContinue.OnContinue += FadeOut;
+    PressAnyKeyToContinue.OnContinue += OnContinue;
   }
 
   void OnDisable() {
-    PressAnyKeyToContinue.OnContinue -= FadeOut;
+    PressAnyKeyToContinue.OnContinue -= OnContinue;
   }
 
   void SetVolume(float volume) {
@@ -37,21 +38,28 @@ public class FadeInOutAudio : MonoBehaviour {
   }
 
   public void FadeOut() {
-    if (Application.loadedLevel >= activeStages + start_stage_ - 1) {
-      fading_out_ = true;
-      start_fade_volume_ = GetComponent<AudioSource>().volume;
-      start_fade_time_ = time_alive_;
-    }
+    fading_out_ = true;
+  }
+
+  public void FadeIn() {
+    fading_out_ = false;
+  }
+
+  public void OnContinue() {
+    if (Application.loadedLevel >= activeStages + start_stage_ - 1)
+      FadeOut();
   }
 
   void Update() {
-    time_alive_ += Time.deltaTime;
     if (fading_out_) {
-      float t = (time_alive_ - start_fade_time_) / fadeOutTime;
-      SetVolume(start_fade_volume_ * (1.0f - fadeCurve.Evaluate(t)));
+      time_since_fade_out_ += Time.deltaTime;
+      if (time_since_fade_out_ >= fadeOutWaitTime)
+        progress_ -= Time.deltaTime / fadeOutTime;
     }
-    else if (time_alive_ < fadeInTime)
-      SetVolume(maxVolume * fadeCurve.Evaluate(time_alive_ / fadeInTime));
-
+    else if (Time.timeSinceLevelLoad >= fadeInWaitTime)
+      progress_ += Time.deltaTime / fadeInTime;
+    
+    progress_ = Mathf.Clamp(progress_, 0.0f, 1.0f);
+    SetVolume(maxVolume * fadeCurve.Evaluate(progress_));
   }
 }

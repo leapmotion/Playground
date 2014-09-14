@@ -34,6 +34,10 @@ public class FadeInOut : MonoBehaviour {
     if (leap_hand == null || time_alive_ >= fadeOutAfterTime) {
       alpha_ -= delta_time / fadeOutTime;
       alpha_ = Mathf.Clamp(alpha_, 0.0f, 1.0f);
+      if (leap_hand == null && alpha_ <= 0.0f) {
+        Destroy(gameObject);
+        return;
+      }
     }
     else if (time_alive_ >= fadeInWait) {
       alpha_ += delta_time / fadeInTime;

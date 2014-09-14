@@ -19,9 +19,10 @@ public class RobotLoveyHead : RobotHead {
 
   public float spinTorqueScale = 1.0f;
   public AnimationCurve spinTorqueCurve;
-  public float spinFrequency = 1.0f;
 
   public ParticleSystem hearts;
+  public AudioSource beatSource;
+  public float spinsPerLoop = 1.0f;
 
   void Start() {
     SetFaceAlpha(0.0f);
@@ -91,8 +92,11 @@ public class RobotLoveyHead : RobotHead {
     }
 
     if (GetBody().feet.IsUpright()) {
-      float spins = active_time_ * spinFrequency;
-      float spin_torque = spinTorqueScale * spinTorqueCurve.Evaluate(spins - (int)spins);
+      float progress = (1.0f * beatSource.timeSamples) / beatSource.clip.samples;
+      float spin_phase = spinsPerLoop * progress;
+      spin_phase -= (int)spin_phase;
+      
+      float spin_torque = spinTorqueScale * spinTorqueCurve.Evaluate(spin_phase);
       rigidbody.AddTorque(spin_torque * GetBody().transform.up);
     }
 

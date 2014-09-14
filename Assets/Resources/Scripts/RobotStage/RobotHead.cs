@@ -8,6 +8,8 @@ public class RobotHead : MonoBehaviour {
   public Transform face;
   public AudioClip bootUpNoise;
   public AudioClip shutDownNoise;
+  public float bootUpVolume = 1.0f;
+  public float shutDownVolume = 1.0f;
 
   public delegate void NotifyBootUp();
   public static event NotifyBootUp OnBootUp;
@@ -28,12 +30,12 @@ public class RobotHead : MonoBehaviour {
   }
 
   public virtual void BootUp() {
-    audio.PlayOneShot(bootUpNoise, 10.0f);
+    audio.PlayOneShot(bootUpNoise, bootUpVolume);
     OnBootUp();
   }
 
   public virtual void ShutDown() {
-    audio.PlayOneShot(shutDownNoise, 10.0f);
+    audio.PlayOneShot(shutDownNoise, shutDownVolume);
     OnShutDown();
   }
 

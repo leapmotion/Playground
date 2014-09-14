@@ -4,7 +4,8 @@ using System.Collections;
 public class RobotHappyHead : RobotHead {
 
   public float danceScale = 0.5f;
-  public float danceFrequency = 0.0f;
+  public AudioSource beatSource;
+  public float dancesPerLoop = 1.0f;
   public float danceDutyCycle = 0.2f;
 
   public Texture leftHappyEye;
@@ -19,7 +20,6 @@ public class RobotHappyHead : RobotHead {
   public float runSpeed = 3.0f;
 
   private Vector3 resting_anchor_;
-  private float dance_phase_ = 0.0f;
 
   private bool running_ = false;
 
@@ -59,9 +59,11 @@ public class RobotHappyHead : RobotHead {
     if (GetBody() != null) {
       SpringJoint bounce = robot_body_.feet.GetComponent<SpringJoint>();
 
-      dance_phase_ += danceFrequency * Time.deltaTime;
-      dance_phase_ -= (int)dance_phase_;
-      if (dance_phase_ < danceDutyCycle && GetBody().feet.IsUpright())
+      float progress = (1.0f * beatSource.timeSamples) / beatSource.clip.samples;
+      float dance_phase = dancesPerLoop * progress;
+      dance_phase -= (int)dance_phase;
+
+      if (dance_phase < danceDutyCycle && GetBody().feet.IsUpright())
         bounce.connectedAnchor = (1 - danceScale) * resting_anchor_;
       else
         bounce.connectedAnchor = resting_anchor_;
