@@ -45,6 +45,9 @@ public class StemMesh : MonoBehaviour {
   }
 
   public bool IsBroken() {
+    if (broken == null)
+      return false;
+
     for (int i = 0; i < broken.Length; ++i) {
       if (broken[i])
         return true;

@@ -14,13 +14,14 @@ public class DanceFloor : MonoBehaviour {
 
   public Color[] colors;
   public Color defaultColor;
-  public float changeFrequency = 1.0f;
+  public float changesPerCycle = 1.0f;
+  public AudioSource beatSource;
   public float colorChance = 0.2f;
 
   private Texture2D texture_;
   private Color[] pixels_;
-  private float time_ = 0.0f;
   private bool playing_ = true;
+  private float last_phase_ = 0.0f;
 
   void Start() {
     pixels_ = new Color[width * height];
@@ -41,10 +42,11 @@ public class DanceFloor : MonoBehaviour {
     if (!playing_)
       return;
 
-    float increment = changeFrequency * Time.deltaTime;
-    float next_time = time_ + increment;
+    float progress = (1.0f * beatSource.timeSamples) / beatSource.clip.samples;
+    float phase = changesPerCycle * progress;
+    phase -= (int)phase;
 
-    if ((int)time_ < (int)next_time) {
+    if (phase < last_phase_) {
       for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
           if (Random.Range(0.0f, 1.0f) < colorChance)
@@ -56,6 +58,6 @@ public class DanceFloor : MonoBehaviour {
       texture_.SetPixels(pixels_);
       texture_.Apply();
     }
-    time_ = next_time;
+    last_phase_ = phase;
   }
 }
