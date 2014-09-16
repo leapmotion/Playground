@@ -6,8 +6,34 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Runtime.InteropServices;
 
 public class Localization : MonoBehaviour {
+
+#if UNITY_STANDALONE_WIN
+
+  [DllImport("KERNEL32.DLL")]
+  private static extern System.UInt16 GetSystemDefaultUILanguage();
+
+  private bool IsTraditionalChinese() {
+    System.UInt16 identifier = GetSystemDefaultUILanguage();
+    return identifier == 0x0c04 || // Hong Kong
+           identifier == 0x1404 || // Macao
+           identifier == 0x0404;   // Taiwan
+  }
+
+#elif UNITY_STANDALONE_OSX
+
+  [DllImport("CheckChineseTraditional")]
+  private static extern bool IsTraditionalChinese();
+
+#else
+
+  private bool IsTraditionalChinese() {
+    return false;
+  }
+
+#endif
 
   public string english;
   public string chineseSimplified;
@@ -28,7 +54,10 @@ public class Localization : MonoBehaviour {
         text.text = english;
         break;
       case SystemLanguage.Chinese:
-        text.text = chineseSimplified;
+        if (IsTraditionalChinese())
+          text.text = chineseTraditional;
+        else
+          text.text = chineseSimplified;
         break;
       case SystemLanguage.French:
         text.text = french;
