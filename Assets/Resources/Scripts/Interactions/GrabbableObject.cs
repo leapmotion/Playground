@@ -27,8 +27,11 @@ public class GrabbableObject : MonoBehaviour {
   }
 
   void OnJointBreak(float break_force) {
-    for (int i = 0; i < ignoreOnGrab.Length; ++i)
-      ignoreOnGrab[i].gameObject.layer = LayerMask.NameToLayer("Broken");
+    for (int i = 0; i < ignoreOnGrab.Length; ++i) {
+      // Clears ignore collision with flower.
+      ignoreOnGrab[i].collider.enabled = false;
+      ignoreOnGrab[i].collider.enabled = true;
+    }
   }
 
   public virtual void OnGrab(){

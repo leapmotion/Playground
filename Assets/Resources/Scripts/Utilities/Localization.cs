@@ -10,7 +10,13 @@ using System.Runtime.InteropServices;
 
 public class Localization : MonoBehaviour {
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_EDITOR
+
+  private bool IsTraditionalChinese() {
+    return false;
+  }
+
+#elif UNITY_STANDALONE_WIN
 
   [DllImport("KERNEL32.DLL")]
   private static extern System.UInt16 GetSystemDefaultUILanguage();
@@ -19,19 +25,13 @@ public class Localization : MonoBehaviour {
     System.UInt16 identifier = GetSystemDefaultUILanguage();
     return identifier == 0x0c04 || // Hong Kong
            identifier == 0x1404 || // Macao
-           identifier == 0x0404;   // Taiwan
+           identifier == 0x0404 || identifier == 1028;   // Taiwan
   }
 
 #elif UNITY_STANDALONE_OSX
 
   [DllImport("CheckChineseTraditional")]
   private static extern bool IsTraditionalChinese();
-
-#else
-
-  private bool IsTraditionalChinese() {
-    return false;
-  }
 
 #endif
 
