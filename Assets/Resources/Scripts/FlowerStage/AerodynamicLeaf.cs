@@ -32,14 +32,14 @@ public class AerodynamicLeaf : MonoBehaviour {
 
   private float air_drag_;
   private float air_angular_drag_;
-  private float current_drag_force_;
-  private float current_drag_torque_;
+  private float drag_force_;
+  private float drag_torque_;
 
   void Start() {
     air_drag_ = rigidbody.drag;
     air_angular_drag_ = rigidbody.angularDrag;
-    current_drag_force_ = airDragForce;
-    current_drag_torque_ = airDragTorque;
+    drag_force_ = airDragForce;
+    drag_torque_ = airDragTorque;
   }
 
   void DragUpdate() {
@@ -47,17 +47,17 @@ public class AerodynamicLeaf : MonoBehaviour {
     Vector3 normal = transform.up;
 
     float dot = Vector3.Dot(velocity, normal);
-    rigidbody.AddForce(-normal * current_drag_force_ * dot);
+    rigidbody.AddForce(-normal * drag_force_ * dot);
 
     Vector3 cross = Vector3.Cross(velocity, normal);
-    rigidbody.AddTorque(-current_drag_torque_ * cross);
+    rigidbody.AddTorque(-drag_torque_ * cross);
   }
 
   void AirUpdate() {
     rigidbody.drag = air_drag_;
     rigidbody.angularDrag = air_angular_drag_;
-    current_drag_force_ = airDragForce;
-    current_drag_torque_ = airDragTorque;
+    drag_force_ = airDragForce;
+    drag_torque_ = airDragTorque;
     DragUpdate();
   }
 
@@ -65,8 +65,8 @@ public class AerodynamicLeaf : MonoBehaviour {
     rigidbody.drag = waterDrag;
     rigidbody.angularDrag = waterAngularDrag;
 
-    current_drag_force_ = waterDragForce;
-    current_drag_torque_ = waterDragTorque;
+    drag_force_ = waterDragForce;
+    drag_torque_ = waterDragTorque;
     DragUpdate();
 
     float transition = Mathf.Clamp(-level / transitionWidth, 0.0f, 1.0f);
@@ -81,7 +81,7 @@ public class AerodynamicLeaf : MonoBehaviour {
       rigidbody.AddTorque((1 - transition) * waterSurfaceTorque * torque_vector);
     }
 
-    // Current.
+    // Running water current.
     Vector3 delta_current = waterCurrentVelocity - rigidbody.velocity;
     delta_current.y = 0;
     rigidbody.AddForce(waterCurrentForce * delta_current);

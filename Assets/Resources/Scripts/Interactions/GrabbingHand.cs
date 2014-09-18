@@ -12,32 +12,48 @@ using Leap;
 // closest rigidbody with a spring force if it's within a given range.
 public class GrabbingHand : MonoBehaviour {
 
-  private const float RELEASE_MAXIMUM_SPRING = 0.05f;
-  private const float RELEASE_DAMPING = 0.1f;
+  public enum PinchState {
+    kPinched,
+    kReleased,
+    kReleasing
+  }
 
-  public float grabDistanceRatio = 0.7f;
+  protected const float RELEASE_MAXIMUM_SPRING = 0.05f;
+  protected const float RELEASE_DAMPING = 0.1f;
+
+  public LayerMask grabbableLayers;
+  public float grabObjectDistanceRatio = 0.7f;
   public float releaseDistanceRatio = 1.2f;
-  public float grabDistance = 2.0f;
+  public float grabObjectDistance = 2.0f;
+  public float releaseBreakDistance = 0.3f;
+
   public float rotationFiltering = 0.4f;
   public float positionFiltering = 0.4f;
   public float minConfidence = 0.3f;
   public float maxVelocity = 0.3f;
-  public LayerMask grabbableLayers;
 
   public Vector3 maxMovement = new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
   public Vector3 minMovement = new Vector3(-Mathf.Infinity, -Mathf.Infinity, -Mathf.Infinity);
 
-  private float last_max_angular_velocity_;
-  private bool pinching_;
-  private bool releasing_;
-  private float release_distance_;
-  private Collider grabbed_;
-  private Quaternion rotation_from_palm_;
+  protected PinchState pinch_state_;
+  protected Collider active_object_;
 
-  private Vector3 current_pinch_;
-  private Quaternion palm_rotation_;
+  protected float last_max_angular_velocity_;
+  protected Quaternion rotation_from_palm_;
 
-  private void IgnoreCollisions(GameObject obj, bool ignore = true) {
+  protected Vector3 current_pinch_;
+  protected Quaternion palm_rotation_;
+
+  void Start() {
+    pinch_state_ = PinchState.kReleased;
+    active_object_ = null;
+  }
+
+  void OnDestroy() {
+    OnRelease();
+  }
+
+  protected void IgnoreCollisions(GameObject obj, bool ignore = true) {
     Collider[] first_colliders = GetComponentsInChildren<Collider>();
     Collider[] second_colliders = obj.GetComponentsInChildren<Collider>();
 
@@ -47,49 +63,62 @@ public class GrabbingHand : MonoBehaviour {
     }
   }
 
-  void Start() {
-    pinching_ = false;
-    releasing_ = false;
-    release_distance_ = 0.0f;
-    grabbed_ = null;
-  }
-
-  void OnDestroy() {
-    OnRelease();
-  }
-
-  private void OnPinch(Vector3 pinch_position) {
-    pinching_ = true;
-    releasing_ = false;
-
-    // Check if we pinched a movable object and grab the closest one that's not part of the hand.
-    Collider[] close_things = Physics.OverlapSphere(pinch_position, grabDistance, grabbableLayers);
-    Vector3 distance = new Vector3(grabDistance, 0.0f, 0.0f);
-
-    HandModel hand_model = GetComponent<HandModel>();
+  protected Collider GetClosestGrabbableObject(Vector3 pinch_position) {
+    Collider closest = null;
+    Vector3 distance = new Vector3(grabObjectDistance, 0.0f, 0.0f);
+    Collider[] close_things = Physics.OverlapSphere(pinch_position, grabObjectDistance, grabbableLayers);
 
     for (int j = 0; j < close_things.Length; ++j) {
       Vector3 new_distance = pinch_position - close_things[j].transform.position;
       if (close_things[j].rigidbody != null && new_distance.magnitude < distance.magnitude &&
           !close_things[j].transform.IsChildOf(transform) &&
           close_things[j].tag != "NotGrabbable") {
-        grabbed_ = close_things[j];
-        distance = new_distance;
+        GrabbableObject grabbable = close_things[j].GetComponent<GrabbableObject>();
+        if (grabbable == null || !grabbable.IsGrabbed()) {
+          closest = close_things[j];
+          distance = new_distance;
+        }
       }
     }
 
-    if (grabbed_ != null) {
-      IgnoreCollisions(grabbed_.gameObject, true);
+    return closest;
+  }
+
+  protected void Hover(Vector3 pinch_position) {
+    Collider hover = GetClosestGrabbableObject(pinch_position);
+
+    if (hover != active_object_ && active_object_ != null) {
+      GrabbableObject old_grabbable = active_object_.GetComponent<GrabbableObject>();
+
+      if (old_grabbable != null)
+        old_grabbable.OnStopHover();
+    }
+
+    if (hover != null) {
+      GrabbableObject new_grabbable = hover.GetComponent<GrabbableObject>();
+
+      if (new_grabbable != null)
+        new_grabbable.OnStartHover();
+    }
+
+    active_object_ = hover;
+  }
+
+  protected void StartPinch(Vector3 pinch_position) {
+    HandModel hand_model = GetComponent<HandModel>();
+    if (active_object_ != null) {
+      IgnoreCollisions(active_object_.gameObject, true);
 
       palm_rotation_ = hand_model.GetPalmRotation();
-      rotation_from_palm_ = Quaternion.Inverse(palm_rotation_) * grabbed_.transform.rotation;
-      current_pinch_ = grabbed_.transform.position;
+      rotation_from_palm_ = Quaternion.Inverse(palm_rotation_) * active_object_.transform.rotation;
+      current_pinch_ = active_object_.transform.position;
 
-      GrabbableObject grabbable = grabbed_.GetComponent<GrabbableObject>();
+      GrabbableObject grabbable = active_object_.GetComponent<GrabbableObject>();
       if (grabbable == null || grabbable.rotateQuickly) {
-        last_max_angular_velocity_ = grabbed_.rigidbody.maxAngularVelocity;
-        grabbed_.rigidbody.maxAngularVelocity = Mathf.Infinity;
+        last_max_angular_velocity_ = active_object_.rigidbody.maxAngularVelocity;
+        active_object_.rigidbody.maxAngularVelocity = Mathf.Infinity;
       }
+
       if (grabbable != null) {
         grabbable.OnGrab();
 
@@ -99,7 +128,7 @@ public class GrabbingHand : MonoBehaviour {
             palm_vector = Vector3.Scale(palm_vector, new Vector3(-1, 1, 1));
 
           Quaternion relative_rotation = Quaternion.Inverse(palm_rotation_) *
-                                         grabbed_.transform.rotation;
+                                         active_object_.transform.rotation;
           Vector3 axis_in_palm = relative_rotation * grabbable.objectOrientation;
           Quaternion axis_correction = Quaternion.FromToRotation(axis_in_palm, palm_vector);
           if (Vector3.Dot(axis_in_palm, palm_vector) < 0)
@@ -111,134 +140,162 @@ public class GrabbingHand : MonoBehaviour {
     }
   }
 
-  void OnReleasing(float release_distance) {
-    pinching_ = false;
-    releasing_ = true;
-    release_distance_ = release_distance;
-  }
-
   void OnRelease() {
-    pinching_ = false;
-    releasing_ = false;
-    if (grabbed_ != null) {
-      GrabbableObject grabbable = grabbed_.GetComponent<GrabbableObject>();
+    if (active_object_ != null) {
+      GrabbableObject grabbable = active_object_.GetComponent<GrabbableObject>();
       if (grabbable != null)
         grabbable.OnRelease();
 
       if (grabbable == null || grabbable.rotateQuickly)
-        grabbed_.rigidbody.maxAngularVelocity = last_max_angular_velocity_;
+        active_object_.rigidbody.maxAngularVelocity = last_max_angular_velocity_;
 
-      IgnoreCollisions(grabbed_.gameObject, false);
+      IgnoreCollisions(active_object_.gameObject, false);
 
     }
-    grabbed_ = null;
+    active_object_ = null;
+  }
+
+  public PinchState GetPinchState(Vector3 pinch_position) {
+    HandModel hand_model = GetComponent<HandModel>();
+    Hand leap_hand = hand_model.GetLeapHand();
+
+    Vector leap_thumb_tip = leap_hand.Fingers[0].TipPosition;
+    float closest_distance = Mathf.Infinity;
+
+    // Check thumb tip distance to joints on all other fingers.
+    // If it's close enough, you're pinching.
+    for (int i = 1; i < HandModel.NUM_FINGERS; ++i) {
+      Finger finger = leap_hand.Fingers[i];
+
+      for (int j = 0; j < FingerModel.NUM_BONES; ++j) {
+        Vector leap_joint_position = finger.Bone((Bone.BoneType)j).NextJoint;
+
+        float thumb_tip_distance = leap_joint_position.DistanceTo(leap_thumb_tip);
+        closest_distance = Mathf.Min(closest_distance, thumb_tip_distance);
+      }
+    }
+
+    // Scale trigger distance by thumb proximal bone length.
+    float proximal_length = leap_hand.Fingers[0].Bone(Bone.BoneType.TYPE_PROXIMAL).Length;
+    float trigger_distance = proximal_length * grabObjectDistanceRatio;
+    float release_distance = proximal_length * releaseDistanceRatio;
+
+    if (closest_distance <= trigger_distance)
+      return PinchState.kPinched;
+    if (closest_distance <= release_distance && pinch_state_ != PinchState.kReleased &&
+        !ObjectReleaseBreak(pinch_position))
+      return PinchState.kReleasing;
+    return PinchState.kReleased;
+  }
+
+  Vector3 GetPinchPosition() {
+    HandModel hand_model = GetComponent<HandModel>();
+    return 0.5f * (hand_model.fingers[0].GetTipPosition() + 
+                   hand_model.fingers[1].GetTipPosition());
+  }
+
+  void UpdatePalmRotation() {
+    HandModel hand_model = GetComponent<HandModel>();
+    palm_rotation_ = Quaternion.Slerp(palm_rotation_, hand_model.GetPalmRotation(),
+                                      1.0f - rotationFiltering);
+  }
+
+
+  void ContinueHardPinch(Vector3 pinch_position) {
+    Vector3 delta_pinch = pinch_position - current_pinch_;
+    current_pinch_ = current_pinch_ + (1.0f - positionFiltering) * delta_pinch;
+    Quaternion target_rotation = palm_rotation_ * rotation_from_palm_;
+
+    Vector3 clamped_pinch = current_pinch_;
+    clamped_pinch.x = Mathf.Clamp(clamped_pinch.x, minMovement.x, maxMovement.x);
+    clamped_pinch.y = Mathf.Clamp(clamped_pinch.y, minMovement.y, maxMovement.y);
+    clamped_pinch.z = Mathf.Clamp(clamped_pinch.z, minMovement.z, maxMovement.z);
+    Vector3 velocity = (clamped_pinch - active_object_.transform.position) / Time.deltaTime;
+    active_object_.rigidbody.velocity = velocity;
+
+    Quaternion delta_rotation = target_rotation *
+                                Quaternion.Inverse(active_object_.transform.rotation);
+
+    float angle = 0.0f;
+    Vector3 axis = Vector3.zero;
+    delta_rotation.ToAngleAxis(out angle, out axis);
+
+    if (angle >= 180) {
+      angle = 360 - angle;
+      axis = -axis;
+    }
+    if (angle != 0)
+      active_object_.rigidbody.angularVelocity = angle * axis;
+  }
+
+  bool ObjectReleaseBreak(Vector3 pinch_position) {
+    if (active_object_ == null)
+      return true;
+
+    Vector3 delta_position = pinch_position - active_object_.transform.position;
+    return delta_position.magnitude > releaseBreakDistance;
+  }
+
+  void ContinueSoftPinch(Vector3 pinch_position) {
+    Vector3 delta_pinch = pinch_position - current_pinch_;
+    current_pinch_ = current_pinch_ + (1.0f - positionFiltering) * delta_pinch;
+    Quaternion target_rotation = palm_rotation_ * rotation_from_palm_;
+
+    float gravity_amount = RELEASE_MAXIMUM_SPRING;
+    Vector3 delta_position = current_pinch_ - active_object_.transform.position;
+
+    float force = 20 * gravity_amount / (0.04f + delta_position.magnitude * delta_position.magnitude);
+    active_object_.rigidbody.AddForce(delta_position.normalized * force);
+    active_object_.rigidbody.velocity *= 0.9f;
+
+    Quaternion delta_rotation = target_rotation *
+                                Quaternion.Inverse(active_object_.transform.rotation);
+
+    float angle = 0.0f;
+    Vector3 axis = Vector3.zero;
+    delta_rotation.ToAngleAxis(out angle, out axis);
+
+    if (angle >= 180) {
+      angle = 360 - angle;
+      axis = -axis;
+    }
+    if (angle != 0)
+      active_object_.rigidbody.angularVelocity = gravity_amount * angle * axis;
   }
 
   void FixedUpdate() {
-    bool trigger_pinch = false;
-    bool trigger_release = true;
+    UpdatePalmRotation();
     HandModel hand_model = GetComponent<HandModel>();
     Hand leap_hand = hand_model.GetLeapHand();
 
     if (leap_hand == null)
       return;
 
-    // Scale trigger distance by thumb proximal bone length.
-    Vector leap_thumb_tip = leap_hand.Fingers[0].TipPosition;
-    float proximal_length = leap_hand.Fingers[0].Bone(Bone.BoneType.TYPE_PROXIMAL).Length;
-    float trigger_distance = proximal_length * grabDistanceRatio;
-    float release_distance = proximal_length * releaseDistanceRatio;
-    float closest_distance = Mathf.Infinity;
-
-    // Check thumb tip distance to joints on all other fingers.
-    // If it's close enough, start pinching.
-    for (int i = 1; i < HandModel.NUM_FINGERS && !trigger_pinch; ++i) {
-      Finger finger = leap_hand.Fingers[i];
-
-      for (int j = 0; j < FingerModel.NUM_BONES && !trigger_pinch; ++j) {
-        Vector leap_joint_position = finger.Bone((Bone.BoneType)j).NextJoint;
-        if (leap_joint_position.DistanceTo(leap_thumb_tip) < trigger_distance) {
-          trigger_pinch = true;
-          closest_distance = leap_joint_position.DistanceTo(leap_thumb_tip);
-        }
-        if (leap_joint_position.DistanceTo(leap_thumb_tip) < release_distance) {
-          trigger_release = false;
-          closest_distance = leap_joint_position.DistanceTo(leap_thumb_tip);
-        }
-      }
-    }
-
-    Vector3 pinch_position = 0.5f * (hand_model.fingers[0].GetTipPosition() + 
-                                     hand_model.fingers[1].GetTipPosition());
-
-    // Only change state if it's different.
-    if (leap_hand.Confidence >= minConfidence) {
-
-      float velocity = leap_hand.PalmVelocity.ToUnityScaled().magnitude;
-      if (trigger_pinch && !pinching_ && velocity <= maxVelocity)
-        OnPinch(pinch_position);
-      else if (trigger_release && (releasing_ || pinching_))
+    Vector3 pinch_position = GetPinchPosition();
+    PinchState new_pinch_state = GetPinchState(pinch_position);
+    if (pinch_state_ == PinchState.kPinched) {
+      if (new_pinch_state == PinchState.kReleased) {
         OnRelease();
-      else if (!trigger_pinch && pinching_)
-        OnReleasing((closest_distance - trigger_distance) / (release_distance - trigger_distance));
-    }
-
-    // Accelerate what we are grabbing toward the pinch.
-    if (grabbed_ != null) {
-      palm_rotation_ = Quaternion.Slerp(palm_rotation_, hand_model.GetPalmRotation(),
-                                        1.0f - rotationFiltering);
-
-      Vector3 delta_pinch = pinch_position - current_pinch_;
-      current_pinch_ = current_pinch_ + (1.0f - positionFiltering) * delta_pinch;
-      Quaternion target_rotation = palm_rotation_ * rotation_from_palm_;
-
-      if (releasing_) {
-        float gravity_amount = RELEASE_MAXIMUM_SPRING * (1.0f - release_distance_);
-        Vector3 delta_position = current_pinch_ - grabbed_.transform.position;
-        if (delta_position.magnitude > 0.3f) {
-          OnRelease();
-          return;
-        }
-        float force = 20 * gravity_amount / (0.04f + delta_position.magnitude * delta_position.magnitude);
-        grabbed_.rigidbody.AddForce(delta_position.normalized * force);
-        grabbed_.rigidbody.velocity *= 0.9f;
-
-        Quaternion delta_rotation = target_rotation *
-                                    Quaternion.Inverse(grabbed_.transform.rotation);
-
-        float angle = 0.0f;
-        Vector3 axis = Vector3.zero;
-        delta_rotation.ToAngleAxis(out angle, out axis);
-
-        if (angle >= 180) {
-          angle = 360 - angle;
-          axis = -axis;
-        }
-        if (angle != 0)
-          grabbed_.rigidbody.angularVelocity = gravity_amount * angle * axis;
+        Hover(pinch_position);
       }
-      else {
-        Vector3 clamped_pinch = current_pinch_;
-        clamped_pinch.x = Mathf.Clamp(clamped_pinch.x, minMovement.x, maxMovement.x);
-        clamped_pinch.y = Mathf.Clamp(clamped_pinch.y, minMovement.y, maxMovement.y);
-        clamped_pinch.z = Mathf.Clamp(clamped_pinch.z, minMovement.z, maxMovement.z);
-        Vector3 velocity = (clamped_pinch - grabbed_.transform.position) / Time.deltaTime;
-        grabbed_.rigidbody.velocity = velocity;
-
-        Quaternion delta_rotation = target_rotation *
-                                    Quaternion.Inverse(grabbed_.transform.rotation);
-
-        float angle = 0.0f;
-        Vector3 axis = Vector3.zero;
-        delta_rotation.ToAngleAxis(out angle, out axis);
-
-        if (angle >= 180) {
-          angle = 360 - angle;
-          axis = -axis;
-        }
-        if (angle != 0)
-          grabbed_.rigidbody.angularVelocity = angle * axis;
-      }
+      else if (active_object_ != null)
+        ContinueHardPinch(pinch_position);
     }
+    else if (pinch_state_ == PinchState.kReleasing) {
+      if (new_pinch_state == PinchState.kReleased) {
+        OnRelease();
+        Hover(pinch_position);
+      }
+      else if (active_object_ != null)
+        ContinueSoftPinch(pinch_position);
+    }
+    else {
+      if (new_pinch_state == PinchState.kPinched) {
+        StartPinch(pinch_position);
+      }
+      else
+        Hover(pinch_position);
+    }
+    pinch_state_ = new_pinch_state;
   }
 }

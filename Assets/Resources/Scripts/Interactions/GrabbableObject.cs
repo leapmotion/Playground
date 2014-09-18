@@ -21,6 +21,11 @@ public class GrabbableObject : MonoBehaviour {
   public bool rotateQuickly = true;
 
   protected bool grabbed_ = false;
+  protected bool hovered_ = false;
+
+  public bool IsHovered() {
+    return hovered_;
+  }
 
   public bool IsGrabbed() {
     return grabbed_;
@@ -34,8 +39,17 @@ public class GrabbableObject : MonoBehaviour {
     }
   }
 
-  public virtual void OnGrab(){
+  public virtual void OnStartHover() {
+    hovered_ = true;
+  }
+
+  public virtual void OnStopHover() {
+    hovered_ = false;
+  }
+
+  public virtual void OnGrab() {
     grabbed_ = true;
+    hovered_ = false;
     for (int i = 0; i < ignoreOnGrab.Length; ++i)
       ignoreOnGrab[i].detectCollisions = false;
 
@@ -48,7 +62,7 @@ public class GrabbableObject : MonoBehaviour {
     }
   }
 
-  public virtual void OnRelease(){
+  public virtual void OnRelease() {
     grabbed_ = false;
     for (int i = 0; i < ignoreOnGrab.Length; ++i)
       ignoreOnGrab[i].detectCollisions = true;

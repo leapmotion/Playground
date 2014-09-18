@@ -10,11 +10,9 @@ public class RobotSadHead : RobotHead {
   public float cloudSpeed = 0.02f;
   public AudioSource beatSource;
   public float dancesPerLoop = 1.0f;
-  public float danceForce = 1.0f;
-  public float maxArmBend = 100.0f;
+  public float headTiltAngle = 5.0f;
 
   private float time_alive_ = 0.0f;
-  private float last_dance_phase_ = 0.0f;
 
   void Start() {
     cloud.Stop();
@@ -34,11 +32,6 @@ public class RobotSadHead : RobotHead {
     cloud.Stop();
     rain.Stop();
     SetFaceAlpha(0.0f);
-    if (GetBody() != null) {
-      foreach (HingeJoint arm_joint in GetBody().armJoints) {
-        arm_joint.useSpring = false;
-      }
-    }
   }
 
   void Update() {
@@ -59,16 +52,8 @@ public class RobotSadHead : RobotHead {
     float progress = (1.0f * beatSource.timeSamples) / beatSource.clip.samples;
     float dance_phase = dancesPerLoop * progress;
     dance_phase -= (int)dance_phase;
-
-    if (last_dance_phase_ > dance_phase) {
-      foreach (HingeJoint arm_joint in GetBody().armJoints) {
-        arm_joint.useSpring = true;
-        JointSpring arm_spring = arm_joint.spring;
-        arm_spring.spring = danceForce;
-        arm_spring.targetPosition = Random.Range(-maxArmBend, maxArmBend);
-        arm_joint.spring = arm_spring;
-      }
-    }
-    last_dance_phase_ = dance_phase;
+    
+    float angle = headTiltAngle * Mathf.Cos(dance_phase * 2.0f * Mathf.PI);
+    transform.rotation = Quaternion.AngleAxis(angle, face.transform.right) * transform.rotation;
   }
 }

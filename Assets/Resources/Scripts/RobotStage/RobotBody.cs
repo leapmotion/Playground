@@ -20,7 +20,6 @@ public class RobotBody : MonoBehaviour {
   public float breakTorque = 10.0f;
   public float uprightAngle = 60.0f;
   public float uprightForce = 1.0f;
-  public HingeJoint[] armJoints;
   public float fallenWaitTime = 2.0f;
   public float upsideDownAngle = 100.0f;
 

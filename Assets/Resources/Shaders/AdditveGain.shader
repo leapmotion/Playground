@@ -7,6 +7,8 @@
   SubShader {
     Tags { "Queue" = "Transparent" }
 
+    Blend One One
+
     CGPROGRAM
 #pragma surface surf Lambert alpha
       struct Input {

@@ -10,6 +10,7 @@ using System.Collections;
 public class ChangeColorOnGrab : GrabbableObject {
 
   public Color colorGrabbed;
+  public Color colorHover;
   public Color colorReleased;
 
   private bool connected_ = false;
@@ -25,6 +26,20 @@ public class ChangeColorOnGrab : GrabbableObject {
 
   public override void OnRelease() {
     base.OnRelease();
+
+    if (!connected_)
+      renderer.material.color = colorReleased;
+  }
+
+  public override void OnStartHover() {
+    base.OnStartHover();
+
+    if (!connected_)
+      renderer.material.color = colorHover;
+  }
+
+  public override void OnStopHover() {
+    base.OnStopHover();
 
     if (!connected_)
       renderer.material.color = colorReleased;

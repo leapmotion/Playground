@@ -33,6 +33,12 @@ public class Localization : MonoBehaviour {
   [DllImport("CheckChineseTraditional")]
   private static extern bool IsTraditionalChinese();
 
+#else
+
+  private bool IsTraditionalChinese() {
+    return false;
+  }
+
 #endif
 
   public string english;
