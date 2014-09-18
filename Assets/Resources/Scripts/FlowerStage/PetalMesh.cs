@@ -29,7 +29,9 @@ public class PetalMesh : MonoBehaviour {
 
   void Update () {
     UpdateMesh();
+    front_.MarkDynamic();
     front_.vertices = vertices_;
+    back_.MarkDynamic();
     back_.vertices = vertices_;
     front_.RecalculateNormals();
     back_.RecalculateNormals();

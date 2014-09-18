@@ -39,6 +39,7 @@ public class StemMesh : MonoBehaviour {
     UpdateMesh();
     MeshFilter filter = GetComponent<MeshFilter>();
 
+    filter.mesh.MarkDynamic();
     filter.mesh.vertices = vertices_;
     filter.mesh.RecalculateBounds();
     filter.mesh.RecalculateNormals();
