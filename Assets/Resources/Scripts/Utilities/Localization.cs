@@ -10,25 +10,86 @@ using System.Runtime.InteropServices;
 
 public class Localization : MonoBehaviour {
 
-#if UNITY_EDITOR
+  public string english;
+  public string chineseSimplified;
+  public string chineseTraditional;
+  public string french;
+  public string german;
+  public string italian;
+  public string japanese;
+  public string korean;
+  public string portuguese;
+  public string spanish;
 
-  private bool IsTraditionalChinese() {
-    return false;
-  }
-
-#elif UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN
 
   [DllImport("KERNEL32.DLL")]
-  private static extern System.UInt16 GetSystemDefaultUILanguage();
+  private static extern System.UInt16 GetUserDefaultUILanguage();
 
-  private bool IsTraditionalChinese() {
-    System.UInt16 identifier = GetSystemDefaultUILanguage();
-    return identifier == 0x0c04 || // Hong Kong
-           identifier == 0x1404 || // Macao
-           identifier == 0x0404 || identifier == 1028;   // Taiwan
+  public string GetLocalizedText() {
+    System.UInt16 identifier = GetUserDefaultUILanguage();
+
+    switch (identifier) {
+      case 0x409:
+        return english;
+      case 0x804:
+        return chineseSimplified;
+      case 0xc04:
+      case 0x1404:
+      case 0x404:
+        return chineseTraditional;
+      case 0x40C:
+        return french;
+      case 0x407:
+        return german;
+      case 0x410:
+        return italian;
+      case 0x411:
+        return japanese;
+      case 0x412:
+        return korean;
+      case 0x416:
+      case 0x816:
+        return portuguese;
+      case 0xC0A:
+        return spanish;
+      default:
+        return english;
+    }
   }
 
-#elif UNITY_STANDALONE_OSX
+#else
+
+  public string GetLocalizedText() {
+    switch (Application.systemLanguage) {
+      case SystemLanguage.English:
+        return english;
+      case SystemLanguage.Chinese:
+        if (IsTraditionalChinese())
+          return chineseTraditional;
+        return chineseSimplified;
+      case SystemLanguage.French:
+        return french;
+      case SystemLanguage.German:
+        return german;
+      case SystemLanguage.Italian:
+        return italian;
+      case SystemLanguage.Japanese:
+        return japanese;
+      case SystemLanguage.Korean:
+        return korean;
+      case SystemLanguage.Portuguese:
+        return portuguese;
+      case SystemLanguage.Spanish:
+        return spanish;
+      default:
+        return english;
+    }
+  }
+
+#endif
+
+#if UNITY_STANDALONE_OSX
 
   [DllImport("CheckChineseTraditional")]
   private static extern bool IsTraditionalChinese();
@@ -41,55 +102,8 @@ public class Localization : MonoBehaviour {
 
 #endif
 
-  public string english;
-  public string chineseSimplified;
-  public string chineseTraditional;
-  public string french;
-  public string german;
-  public string italian;
-  public string japanese;
-  public string korean;
-  public string portuguese;
-  public string spanish;
-
   public void Start() {
-    GUIText text = GetComponent<GUIText>();
-
-    switch (Application.systemLanguage) {
-      case SystemLanguage.English:
-        text.text = english;
-        break;
-      case SystemLanguage.Chinese:
-        if (IsTraditionalChinese())
-          text.text = chineseTraditional;
-        else
-          text.text = chineseSimplified;
-        break;
-      case SystemLanguage.French:
-        text.text = french;
-        break;
-      case SystemLanguage.German:
-        text.text = german;
-        break;
-      case SystemLanguage.Italian:
-        text.text = italian;
-        break;
-      case SystemLanguage.Japanese:
-        text.text = japanese;
-        break;
-      case SystemLanguage.Korean:
-        text.text = korean;
-        break;
-      case SystemLanguage.Portuguese:
-        text.text = portuguese;
-        break;
-      case SystemLanguage.Spanish:
-        text.text = spanish;
-        break;
-      default:
-        text.text = english;
-        break;
-    }
+    GetComponent<GUIText>().text = GetLocalizedText();
   }
 }
 

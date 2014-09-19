@@ -9,15 +9,22 @@ using System.Collections;
 
 public class LevelSelector : MonoBehaviour {
 
+  public int maxLevels = 4;
+
+  private void LoadLevel(int level) {
+    KeepToNextScene[] to_delete = FindObjectsOfType<KeepToNextScene>() as KeepToNextScene[];
+    foreach(KeepToNextScene deleted in to_delete)
+      Destroy(deleted.gameObject);
+
+    Application.LoadLevel(level);
+  }
+
   public void Update() {
-    if (Input.GetKeyDown("1"))
-      Application.LoadLevel(0);
-    else if (Input.GetKeyDown("2"))
-      Application.LoadLevel(1);
-    else if (Input.GetKeyDown("3"))
-      Application.LoadLevel(2);
-    else if (Input.GetKeyDown("4"))
-      Application.LoadLevel(3);
+    for (int i = 0; i < maxLevels; ++i) {
+      if (Input.GetKeyDown((i + 1).ToString())) {
+        LoadLevel(i);
+        return;
+      }
+    }
   }
 }
-

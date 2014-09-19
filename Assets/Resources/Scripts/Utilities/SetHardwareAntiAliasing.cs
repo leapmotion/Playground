@@ -7,7 +7,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class EnableHardwareAntiAliasing : MonoBehaviour {
+public class SetHardwareAntiAliasing : MonoBehaviour {
 
   public int antiAliasingLevel = 2;
 
