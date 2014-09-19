@@ -70,7 +70,7 @@ public class FadeRecording : MonoBehaviour {
     float progress = controller.GetRecordingProgress();
 
     if (live_controller_ != null &&
-        live_controller_.GetAllGraphicHands().Length > 0 &&
+        live_controller_.GetAllGraphicsHands().Length > 0 &&
         onlyPlayIfNoHands) {
       force_fade_ *= forceFadeDecay;
     }
@@ -96,7 +96,7 @@ public class FadeRecording : MonoBehaviour {
     else if (1.0f - progress < fadeOutLength)
       alpha *= (1.0f - progress) / fadeOutLength;
 
-    HandModel[] hands = controller.GetAllGraphicHands();
+    HandModel[] hands = controller.GetAllGraphicsHands();
     foreach (HandModel hand in hands) {
       Renderer[] renderers = hand.GetComponentsInChildren<Renderer>();
       for (int i = 0; i < renderers.Length; ++i)

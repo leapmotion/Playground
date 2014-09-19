@@ -49,12 +49,12 @@ public class TextFader : MonoBehaviour {
   
   bool ShouldShowText() {
     return time_connected_ >= waitTime && !exiting_ && !dontShowAnymore &&
-           (!showOnlyWhenNoHands || controller.GetAllGraphicHands().Length == 0) &&
+           (!showOnlyWhenNoHands || controller.GetAllGraphicsHands().Length == 0) &&
            (!showOnlyAfterUse || shown_hands_);
   }
 
   void Update() {
-    shown_hands_ = shown_hands_ || controller.GetAllGraphicHands().Length > 0;
+    shown_hands_ = shown_hands_ || controller.GetAllGraphicsHands().Length > 0;
 
     if (controller != null && controller.IsConnected())
       time_connected_ += Time.deltaTime;

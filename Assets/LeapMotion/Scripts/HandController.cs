@@ -37,15 +37,16 @@ public class HandController : MonoBehaviour {
   public float recorderSpeed = 1.0f;
   public bool recorderLoop = true;
   
-  private LeapRecorder recorder_ = new LeapRecorder();
+  protected LeapRecorder recorder_ = new LeapRecorder();
   
-  private Controller leap_controller_;
+  protected Controller leap_controller_;
 
-  private Dictionary<int, HandModel> hand_graphics_;
-  private Dictionary<int, HandModel> hand_physics_;
-  private Dictionary<int, ToolModel> tools_;
+  protected Dictionary<int, HandModel> hand_graphics_;
+  protected Dictionary<int, HandModel> hand_physics_;
+  protected Dictionary<int, ToolModel> tools_;
   
   void OnDrawGizmos() {
+    // Draws the little Leap Motion Controller in the Editor view.
     Gizmos.matrix = Matrix4x4.Scale(GIZMO_SCALE * Vector3.one);
     Gizmos.DrawIcon(transform.position, "leap_motion.png");
   }
@@ -61,7 +62,6 @@ public class HandController : MonoBehaviour {
       policy_flags &= ~Controller.PolicyFlag.POLICY_OPTIMIZE_HMD;
 
     leap_controller_.SetPolicyFlags(policy_flags);
-
   }
 
   void Start() {
@@ -80,7 +80,7 @@ public class HandController : MonoBehaviour {
       recorder_.Load(recordingAsset);
   }
 
-  private void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
+  protected void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
     if (first == null || second == null)
       return;
 
@@ -93,7 +93,7 @@ public class HandController : MonoBehaviour {
     }
   }
 
-  private void IgnoreCollisionsWithChildren(GameObject to_ignore) {
+  protected void IgnoreCollisionsWithChildren(GameObject to_ignore) {
     IgnoreCollisions(gameObject, to_ignore);
   }
 
@@ -102,7 +102,7 @@ public class HandController : MonoBehaviour {
       IgnoreCollisions(hand.gameObject, to_ignore, ignore);
   }
 
-  private HandModel CreateHand(HandModel model) {
+  protected HandModel CreateHand(HandModel model) {
     HandModel hand_model = Instantiate(model, transform.position, transform.rotation)
                            as HandModel;
     hand_model.gameObject.SetActive(true);
@@ -110,16 +110,16 @@ public class HandController : MonoBehaviour {
     return hand_model;
   }
 
-  private void DestroyHand(HandModel hand_model) {
+  protected void DestroyHand(HandModel hand_model) {
     if (destroyHands)
       Destroy(hand_model.gameObject);
     else
       hand_model.SetLeapHand(null);
   }
 
-  private void UpdateHandModels(Dictionary<int, HandModel> all_hands,
-                                HandList leap_hands,
-                                HandModel left_model, HandModel right_model) {
+  protected void UpdateHandModels(Dictionary<int, HandModel> all_hands,
+                                  HandList leap_hands,
+                                  HandModel left_model, HandModel right_model) {
     List<int> ids_to_check = new List<int>(all_hands.Keys);
 
     // Go through all the active hands and update them.
@@ -176,7 +176,7 @@ public class HandController : MonoBehaviour {
     }
   }
 
-  private ToolModel CreateTool(ToolModel model) {
+  ToolModel CreateTool(ToolModel model) {
     ToolModel tool_model = Instantiate(model, transform.position, transform.rotation)
                            as ToolModel;
     tool_model.gameObject.SetActive(true);
@@ -184,8 +184,8 @@ public class HandController : MonoBehaviour {
     return tool_model;
   }
 
-  private void UpdateToolModels(Dictionary<int, ToolModel> all_tools,
-                                ToolList leap_tools, ToolModel model) {
+  protected void UpdateToolModels(Dictionary<int, ToolModel> all_tools,
+                                  ToolList leap_tools, ToolModel model) {
     List<int> ids_to_check = new List<int>(all_tools.Keys);
 
     // Go through all the active tools and update them.
@@ -251,6 +251,46 @@ public class HandController : MonoBehaviour {
     UpdateToolModels(tools_, frame.Tools, toolModel);
   }
 
+  public bool IsConnected() {
+    return leap_controller_.IsConnected;
+  }
+
+  public bool IsEmbedded() {
+    DeviceList devices = leap_controller_.Devices;
+    if (devices.Count == 0)
+      return false;
+    return devices[0].IsEmbedded;
+  }
+
+  public HandModel[] GetAllGraphicsHands() {
+    if (hand_graphics_ == null)
+      return new HandModel[0];
+
+    HandModel[] models = new HandModel[hand_graphics_.Count];
+    hand_graphics_.Values.CopyTo(models, 0);
+    return models;
+  }
+
+  public HandModel[] GetAllPhysicsHands() {
+    if (hand_physics_ == null)
+      return new HandModel[0];
+
+    HandModel[] models = new HandModel[hand_physics_.Count];
+    hand_physics_.Values.CopyTo(models, 0);
+    return models;
+  }
+
+  public void DestroyAllHands() {
+    if (hand_graphics_ != null) {
+      foreach (HandModel model in hand_graphics_.Values)
+        Destroy(model.gameObject);
+    }
+    if (hand_physics_ != null) {
+      foreach (HandModel model in hand_physics_.Values)
+        Destroy(model.gameObject);
+    }
+  }
+
   public float GetRecordingProgress() {
     return recorder_.GetProgress();
   }
@@ -281,38 +321,7 @@ public class HandController : MonoBehaviour {
     recorder_.Record();
   }
 
-  public bool IsConnected() {
-    return leap_controller_.IsConnected;
-  }
-
-  public bool IsEmbedded() {
-    DeviceList devices = leap_controller_.Devices;
-    if (devices.Count == 0)
-      return false;
-    return devices[0].IsEmbedded;
-  }
-
-  public void DestroyAllHands() {
-    if (hand_graphics_ != null) {
-      foreach (HandModel model in hand_graphics_.Values)
-        Destroy(model.gameObject);
-    }
-    if (hand_physics_ != null) {
-      foreach (HandModel model in hand_physics_.Values)
-        Destroy(model.gameObject);
-    }
-  }
-  
-  public HandModel[] GetAllGraphicHands() {
-    if (hand_graphics_ == null)
-      return new HandModel[0];
-
-    HandModel[] models = new HandModel[hand_graphics_.Count];
-    hand_graphics_.Values.CopyTo(models, 0);
-    return models;
-  }
-
-  void UpdateRecorder() {
+  protected void UpdateRecorder() {
     if (!enableRecordPlayback)
       return;
 
