@@ -10,7 +10,7 @@ using System.Collections;
 public class FlowerSpawner : MonoBehaviour {
 
   public FlowerGrower[] flowerModels;
-  public int maxFlowers = 2; 
+  public int maxFlowers = 2;
 
   private int next_flower_model_index_ = 0;
   private int current_flower_index_ = 0;
