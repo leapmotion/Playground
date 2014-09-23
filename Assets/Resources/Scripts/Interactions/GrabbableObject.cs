@@ -31,14 +31,6 @@ public class GrabbableObject : MonoBehaviour {
     return grabbed_;
   }
 
-  void OnJointBreak(float break_force) {
-    for (int i = 0; i < ignoreOnGrab.Length; ++i) {
-      // Clears ignore collision with flower.
-      ignoreOnGrab[i].collider.enabled = false;
-      ignoreOnGrab[i].collider.enabled = true;
-    }
-  }
-
   public virtual void OnStartHover() {
     hovered_ = true;
   }
