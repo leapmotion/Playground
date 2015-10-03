@@ -36,12 +36,12 @@ public class RobotHead : MonoBehaviour {
   }
 
   public virtual void BootUp() {
-    audio.PlayOneShot(bootUpNoise, bootUpVolume);
+    GetComponent<AudioSource>().PlayOneShot(bootUpNoise, bootUpVolume);
     OnBootUp();
   }
 
   public virtual void ShutDown() {
-    audio.PlayOneShot(shutDownNoise, shutDownVolume);
+    GetComponent<AudioSource>().PlayOneShot(shutDownNoise, shutDownVolume);
     OnShutDown();
   }
 

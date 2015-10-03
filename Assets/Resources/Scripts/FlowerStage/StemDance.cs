@@ -50,10 +50,10 @@ public class StemDance : MonoBehaviour {
       float dance_amplitude = segmentDanceAmplitude.Evaluate(stem_position);
       float desired_bend = (minBend + (maxBend - minBend) * dance_curve) * dance_amplitude;
 
-      if (segments[i].hingeJoint != null) {
-        JointSpring spring = segments[i].hingeJoint.spring;
+      if (segments[i].GetComponent<HingeJoint>() != null) {
+        JointSpring spring = segments[i].GetComponent<HingeJoint>().spring;
         spring.targetPosition = desired_bend;
-        segments[i].hingeJoint.spring = spring;
+        segments[i].GetComponent<HingeJoint>().spring = spring;
       }
     }
   }

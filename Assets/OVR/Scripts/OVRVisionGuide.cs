@@ -255,9 +255,9 @@ public class OVRVisionGuide : MonoBehaviour
 				float VisionGuideAlpha = 
 				fade * ((Mathf.Sin(Time.time * VisionGuideFlashSpeed) + 1.0f) * 0.5f);
 				          
-				Color c = VisionGuide.renderer.material.GetColor("_Color");
+				Color c = VisionGuide.GetComponent<Renderer>().material.GetColor("_Color");
 				c.a = VisionGuideAlpha;
-				VisionGuide.renderer.material.SetColor("_Color", c);
+				VisionGuide.GetComponent<Renderer>().material.SetColor("_Color", c);
 			}
 		}
 		else

@@ -50,9 +50,9 @@ public class RobotSadHead : RobotHead {
       }
     }
     time_alive_ += Time.deltaTime;
-    cloud.rigidbody.velocity = cloudSpeed * (transform.position + cloudHeight * Vector3.up -
+    cloud.GetComponent<Rigidbody>().velocity = cloudSpeed * (transform.position + cloudHeight * Vector3.up -
                                              cloud.transform.position) / Time.deltaTime;
-    rain.rigidbody.velocity = cloudSpeed * (transform.position + cloudHeight * Vector3.up -
+    rain.GetComponent<Rigidbody>().velocity = cloudSpeed * (transform.position + cloudHeight * Vector3.up -
                                             rain.transform.position) / Time.deltaTime;
 
     float progress = (1.0f * beatSource.timeSamples) / beatSource.clip.samples;

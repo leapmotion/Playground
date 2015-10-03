@@ -10,7 +10,7 @@ using System.Collections;
 public class HideMouse : MonoBehaviour {
 
   void Start() {
-    Screen.showCursor = false;
+    Cursor.visible = false;
   }
 }
 

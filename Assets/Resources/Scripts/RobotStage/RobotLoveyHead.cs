@@ -94,7 +94,7 @@ public class RobotLoveyHead : RobotHead {
       CycleLoveyEyes();
       Vector3 direction = (target.position - transform.position).normalized;
       Vector3 torque = loveRunSpeed * Vector3.Cross(direction, Vector3.up);
-      GetBody().feet.rigidbody.AddTorque(torque);
+      GetBody().feet.GetComponent<Rigidbody>().AddTorque(torque);
     }
 
     if (GetBody().feet.IsUpright()) {
@@ -103,7 +103,7 @@ public class RobotLoveyHead : RobotHead {
       spin_phase -= (int)spin_phase;
       
       float spin_torque = spinTorqueScale * spinTorqueCurve.Evaluate(spin_phase);
-      rigidbody.AddTorque(spin_torque * GetBody().transform.up);
+      GetComponent<Rigidbody>().AddTorque(spin_torque * GetBody().transform.up);
     }
 
     active_time_ += Time.deltaTime;

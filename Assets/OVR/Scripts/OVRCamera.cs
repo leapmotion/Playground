@@ -143,7 +143,7 @@ public class OVRCamera : MonoBehaviour
 		EyeId = (RightEye) ? 1 : 0;
 
 		// Make sure we render to the whole target.
-		camera.rect = new Rect(0, 0, 1, 1);
+		GetComponent<Camera>().rect = new Rect(0, 0, 1, 1);
 #if UNITY_EDITOR_OSX
 		OVR_SetEndFrameInPresent(false);
 		OVR_SetMacEditorPlay(true);
@@ -182,7 +182,7 @@ public class OVRCamera : MonoBehaviour
 		// This will scale the render texture based on ideal resolution
 		CreateRenderTexture(EyeId, CameraController.CameraTextureScale);
 
-		camera.targetTexture = CameraTexture[EyeId];
+		GetComponent<Camera>().targetTexture = CameraTexture[EyeId];
         OldScale = CameraController.ScaleRenderTarget;
 
         
@@ -261,11 +261,11 @@ public class OVRCamera : MonoBehaviour
 	void SetCameraOrientation()
 	{	
 		// Main camera has a depth of 0, so it will be rendered first
-		if(camera == CameraController.CameraMain)
+		if(GetComponent<Camera>() == CameraController.CameraMain)
 		{
 			if(CameraController.TrackerRotatesY == true)
 			{
-				Vector3 a = camera.transform.rotation.eulerAngles;
+				Vector3 a = GetComponent<Camera>().transform.rotation.eulerAngles;
 				a.x = 0; 
 				a.z = 0;
 				transform.parent.transform.eulerAngles = a;
@@ -300,11 +300,11 @@ public class OVRCamera : MonoBehaviour
 		
 		// * * *
 		// Update camera rotation
-		camera.transform.rotation = q;
+		GetComponent<Camera>().transform.rotation = q;
 		
 		// * * *
 		// Update camera position (first add Offset to parent transform)
-		camera.transform.localPosition = NeckPosition;
+		GetComponent<Camera>().transform.localPosition = NeckPosition;
 	
 		// Adjust neck by taking eye position and transforming through q
 		// Get final camera position as well as the clipping difference 
@@ -316,12 +316,12 @@ public class OVRCamera : MonoBehaviour
 		// For example, this location is used to update the GridCube
 		foreach(OVRCameraGameObject obj in CameraLocalSetList)
 		{
-			if(obj.CameraController.GetCameraDepth() == camera.depth)
+			if(obj.CameraController.GetCameraDepth() == GetComponent<Camera>().depth)
 			{
 				// Initial difference
 				Vector3 newPos = -(qp * CameraPositionOffset);
 				// Final position
-				newPos += camera.transform.position;
+				newPos += GetComponent<Camera>().transform.position;
 			
 				// Set the game object info
 				obj.CameraGameObject.transform.position = newPos;
@@ -330,11 +330,11 @@ public class OVRCamera : MonoBehaviour
 		}
 
 		// Adjust camera position with offset/clipped cam location
-		camera.transform.localPosition += Quaternion.Inverse(camera.transform.parent.rotation) * qp * newCamPos;
+		GetComponent<Camera>().transform.localPosition += Quaternion.Inverse(GetComponent<Camera>().transform.parent.rotation) * qp * newCamPos;
 
 		Vector3 newEyePos = Vector3.zero;
 		newEyePos.x = EyePosition.x;
-		camera.transform.localPosition += camera.transform.localRotation * newEyePos;
+		GetComponent<Camera>().transform.localPosition += GetComponent<Camera>().transform.localRotation * newEyePos;
 	}
 
 	/// <summary>
@@ -409,7 +409,7 @@ public class OVRCamera : MonoBehaviour
 		if (CameraTexture[i] != null)
 			DestroyImmediate(CameraTexture[i]);
 			
-		CameraTexture[i] = new RenderTexture(w, h, 24, (camera.hdr) ? RenderTextureFormat.ARGBFloat : RenderTextureFormat.Default);
+		CameraTexture[i] = new RenderTexture(w, h, 24, (GetComponent<Camera>().hdr) ? RenderTextureFormat.ARGBFloat : RenderTextureFormat.Default);
 		CameraTexture[i].antiAliasing = (QualitySettings.antiAliasing == 0) ? 1 : QualitySettings.antiAliasing;
 
 		CameraTexture[i].Create();

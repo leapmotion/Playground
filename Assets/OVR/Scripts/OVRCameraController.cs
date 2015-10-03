@@ -262,9 +262,9 @@ public class OVRCameraController : MonoBehaviour
 		for (int i = 0; i < cameras.Length; i++)
 		{
 			if(cameras[i].RightEye)
-				SetCameras(CameraLeft, cameras[i].camera);
+				SetCameras(CameraLeft, cameras[i].GetComponent<Camera>());
 			else
-				SetCameras(cameras[i].camera, CameraRight);
+				SetCameras(cameras[i].GetComponent<Camera>(), CameraRight);
 		}
 		
 		if(CameraLeft == null)
@@ -275,7 +275,7 @@ public class OVRCameraController : MonoBehaviour
 
 	void Start()
 	{
-		if (camera == null)
+		if (GetComponent<Camera>() == null)
 		{
 			gameObject.AddComponent<Camera>();
 		}
@@ -292,10 +292,10 @@ public class OVRCameraController : MonoBehaviour
 		else
 		{
 			//HACK: Use the camera to force rendering of the left and right eyes.
-			camera.cullingMask = 0;
-			camera.clearFlags = CameraClearFlags.Nothing;
-			camera.renderingPath = RenderingPath.Forward;
-			camera.orthographic = true;
+			GetComponent<Camera>().cullingMask = 0;
+			GetComponent<Camera>().clearFlags = CameraClearFlags.Nothing;
+			GetComponent<Camera>().renderingPath = RenderingPath.Forward;
+			GetComponent<Camera>().orthographic = true;
 		}
 
 		// Get the required Rift infromation needed to set cameras
@@ -327,7 +327,7 @@ public class OVRCameraController : MonoBehaviour
 			{
 				float w = (UseCameraTexture) ? scale : 0.5f * scale;
 				float x = (UseCameraTexture) ? 0f : (cameras[i].RightEye) ? 0.5f : 0f;
-				cameras[i].camera.rect = new Rect(x, 0f, w, scale);
+				cameras[i].GetComponent<Camera>().rect = new Rect(x, 0f, w, scale);
 			}
 
 			//TODO: Set scale on OVR eye textures.

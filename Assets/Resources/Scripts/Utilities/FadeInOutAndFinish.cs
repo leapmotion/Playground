@@ -22,9 +22,9 @@ public class FadeInOutAndFinish : MonoBehaviour {
   }
 
   void SetAlpha(float alpha) {
-    Color color = renderer.material.color;
+    Color color = GetComponent<Renderer>().material.color;
     color.a = alpha;
-    renderer.material.color = color;
+    GetComponent<Renderer>().material.color = color;
   }
 
   void Update() {

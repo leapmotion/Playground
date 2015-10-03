@@ -160,16 +160,16 @@ public class OVRGridCube : MonoBehaviour
 				cube.layer = CameraController.gameObject.layer;
 				
 				// No shadows
-				cube.renderer.castShadows    = false;
-				cube.renderer.receiveShadows = false;
+				cube.GetComponent<Renderer>().castShadows    = false;
+				cube.GetComponent<Renderer>().receiveShadows = false;
 				
 				// Cube line is white down the middle
 				if (CubeType == 0)
-					cube.renderer.material.color = Color.red;
+					cube.GetComponent<Renderer>().material.color = Color.red;
 				else if (CubeType == 1)	
-					cube.renderer.material.color = Color.white;
+					cube.GetComponent<Renderer>().material.color = Color.white;
 				else
-					cube.renderer.material.color = Color.yellow;
+					cube.GetComponent<Renderer>().material.color = Color.yellow;
 				
 				cube.transform.position = 
 					new Vector3(((float)x * gridScale), 
@@ -205,9 +205,9 @@ public class OVRGridCube : MonoBehaviour
 		foreach(Transform child in CubeGrid.transform)
 		{
 			// Cube line is white down the middle
-			if((child.renderer.material.color == Color.red) ||
-			   (child.renderer.material.color == Color.blue))
-				child.renderer.material.color = c;
+			if((child.GetComponent<Renderer>().material.color == Color.red) ||
+			   (child.GetComponent<Renderer>().material.color == Color.blue))
+				child.GetComponent<Renderer>().material.color = c;
 		}
 	}
 }

@@ -50,7 +50,7 @@ public class RobotHappyHead : RobotHead {
   void RunAway(Transform chaser) {
     Vector3 direction = (transform.position - chaser.transform.position).normalized;
     Vector3 torque = runSpeed * Vector3.Cross(direction, Vector3.up);
-    GetBody().feet.rigidbody.AddTorque(torque);
+    GetBody().feet.GetComponent<Rigidbody>().AddTorque(torque);
   }
 
   void SetEyes(Texture left_eye, Texture right_eye) {

@@ -47,7 +47,7 @@ public class GrabHand : MonoBehaviour {
 
     for (int j = 0; j < close_things.Length; ++j) {
       Vector3 new_distance = pinch_position - close_things[j].transform.position;
-      if (close_things[j].rigidbody != null && new_distance.magnitude < distance.magnitude &&
+      if (close_things[j].GetComponent<Rigidbody>() != null && new_distance.magnitude < distance.magnitude &&
           !close_things[j].transform.IsChildOf(transform)) {
         grabbed_ = close_things[j];
         distance = new_distance;
@@ -55,8 +55,8 @@ public class GrabHand : MonoBehaviour {
     }
 
     if (grabbed_ != null) {
-      grabbed_.rigidbody.maxAngularVelocity = Mathf.Infinity;
-      grabbed_.rigidbody.detectCollisions = false;
+      grabbed_.GetComponent<Rigidbody>().maxAngularVelocity = Mathf.Infinity;
+      grabbed_.GetComponent<Rigidbody>().detectCollisions = false;
       palm_rotation_ = hand_model.GetPalmRotation();
       palm_position_ = hand_model.GetPalmPosition();
       start_rotation_ = grabbed_.transform.rotation * Quaternion.Inverse(palm_rotation_);
@@ -71,8 +71,8 @@ public class GrabHand : MonoBehaviour {
   void OnRelease() {
     pinching_ = false;
     if (grabbed_ != null) {
-      grabbed_.rigidbody.maxAngularVelocity = 7.0f;
-      grabbed_.rigidbody.detectCollisions = true;
+      grabbed_.GetComponent<Rigidbody>().maxAngularVelocity = 7.0f;
+      grabbed_.GetComponent<Rigidbody>().detectCollisions = true;
 
       Grabbable grabbable = grabbed_.GetComponent<Grabbable>();
       if (grabbable != null)
@@ -141,7 +141,7 @@ public class GrabHand : MonoBehaviour {
       }
 
       Vector3 velocity = (target_position - grabbed_.transform.position) / Time.fixedDeltaTime;
-      grabbed_.rigidbody.velocity = velocity;
+      grabbed_.GetComponent<Rigidbody>().velocity = velocity;
 
 
       Quaternion delta_rotation = target_rotation *
@@ -156,7 +156,7 @@ public class GrabHand : MonoBehaviour {
         axis = -axis;
       }
       if (angle != 0)
-        grabbed_.rigidbody.angularVelocity = angle * axis;
+        grabbed_.GetComponent<Rigidbody>().angularVelocity = angle * axis;
     }
   }
 }
