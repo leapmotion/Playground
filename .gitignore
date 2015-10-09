@@ -22,6 +22,7 @@ Temp/
 *~
 *.swp
 *.Trashes
+*.apk
 
 ehthumbs.db
 Thumbs.db
