@@ -25,9 +25,9 @@ public class Blinker : MonoBehaviour {
   }
 
   void SetAlpha(float alpha) {
-    Color color = renderer.material.GetColor("_TintColor");
+    Color color = GetComponent<Renderer>().material.GetColor("_TintColor");
     color.a = maxAlpha * alpha;
-    renderer.material.SetColor("_TintColor", color);
+    GetComponent<Renderer>().material.SetColor("_TintColor", color);
   }
 
   void Update () {

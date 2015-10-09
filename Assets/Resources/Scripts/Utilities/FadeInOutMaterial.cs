@@ -23,14 +23,14 @@ public class FadeInOutMaterial : MonoBehaviour {
   }
 
   void SetAlpha(float alpha) {
-    Color color = renderer.material.GetColor("_TintColor");
+    Color color = GetComponent<Renderer>().material.GetColor("_TintColor");
     color.a = alpha;
-    renderer.material.SetColor("_TintColor", color);
+    GetComponent<Renderer>().material.SetColor("_TintColor", color);
   }
 
   public void FadeOut() {
     fading_out_ = true;
-    start_fade_alpha_ = renderer.material.GetColor("_TintColor").a;
+    start_fade_alpha_ = GetComponent<Renderer>().material.GetColor("_TintColor").a;
     start_fade_time_ = Time.timeSinceLevelLoad;
   }
 

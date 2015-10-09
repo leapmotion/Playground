@@ -17,11 +17,11 @@ public class ForceFieldBounce : MonoBehaviour {
   void OnCollisionEnter(Collision collision) {
     if (collision.collider.GetComponent<ForceField>() != null) {
       float strength = collision.relativeVelocity.magnitude;
-      audio.PlayOneShot(bounceClip, fieldLoudness - 1.0f / strength);
+      GetComponent<AudioSource>().PlayOneShot(bounceClip, fieldLoudness - 1.0f / strength);
     }
     else {
       float strength = collision.relativeVelocity.magnitude;
-      audio.PlayOneShot(floorClip, otherLoudness - 1.0f / strength);
+      GetComponent<AudioSource>().PlayOneShot(floorClip, otherLoudness - 1.0f / strength);
     }
   }
 }

@@ -18,7 +18,7 @@ public class Splasher : MonoBehaviour {
   void Update() {
     if (transform.position.y <= waterLevel &&
         transform.position.y >= waterLevel - waterSplashThickness) {
-      OnSplash(rigidbody.velocity.magnitude);
+      OnSplash(GetComponent<Rigidbody>().velocity.magnitude);
     }
   }
 }

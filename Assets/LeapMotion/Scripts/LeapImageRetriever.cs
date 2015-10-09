@@ -69,9 +69,9 @@ public class LeapImageRetriever : MonoBehaviour {
 
   void Update () {
     if (undistortImage)
-      renderer.material = new Material(Shader.Find(UNDISTORT_SHADER));
+      GetComponent<Renderer>().material = new Material(Shader.Find(UNDISTORT_SHADER));
     else
-      renderer.material = new Material(Shader.Find(NORMAL_SHADER));
+      GetComponent<Renderer>().material = new Material(Shader.Find(NORMAL_SHADER));
 
     Frame frame = leap_controller_.Frame();
 
@@ -119,19 +119,19 @@ public class LeapImageRetriever : MonoBehaviour {
       EncodeDistortion();
     ApplyDataToTextures();
 
-    renderer.material.mainTexture = main_texture_;
-    renderer.material.SetColor("_Color", imageColor);
-    renderer.material.SetFloat("_GammaCorrection", gammaCorrection);
-    renderer.material.SetInt("_BlackIsTransparent", blackIsTransparent ? 1 : 0);
+    GetComponent<Renderer>().material.mainTexture = main_texture_;
+    GetComponent<Renderer>().material.SetColor("_Color", imageColor);
+    GetComponent<Renderer>().material.SetFloat("_GammaCorrection", gammaCorrection);
+    GetComponent<Renderer>().material.SetInt("_BlackIsTransparent", blackIsTransparent ? 1 : 0);
 
     if (undistortImage) {
-      renderer.material.SetTexture("_DistortX", distortionX_);
-      renderer.material.SetTexture("_DistortY", distortionY_);
+      GetComponent<Renderer>().material.SetTexture("_DistortX", distortionX_);
+      GetComponent<Renderer>().material.SetTexture("_DistortY", distortionY_);
 
-      renderer.material.SetFloat("_RayOffsetX", image.RayOffsetX);
-      renderer.material.SetFloat("_RayOffsetY", image.RayOffsetY);
-      renderer.material.SetFloat("_RayScaleX", image.RayScaleX);
-      renderer.material.SetFloat("_RayScaleY", image.RayScaleY);
+      GetComponent<Renderer>().material.SetFloat("_RayOffsetX", image.RayOffsetX);
+      GetComponent<Renderer>().material.SetFloat("_RayOffsetY", image.RayOffsetY);
+      GetComponent<Renderer>().material.SetFloat("_RayScaleX", image.RayScaleX);
+      GetComponent<Renderer>().material.SetFloat("_RayScaleY", image.RayScaleY);
     }
   }
 

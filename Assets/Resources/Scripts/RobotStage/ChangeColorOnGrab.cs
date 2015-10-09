@@ -21,38 +21,38 @@ public class ChangeColorOnGrab : GrabbableObject {
 
   public override void OnGrab() {
     base.OnGrab();
-    renderer.material.color = colorGrabbed;
+    GetComponent<Renderer>().material.color = colorGrabbed;
   }
 
   public override void OnRelease() {
     base.OnRelease();
 
     if (!connected_)
-      renderer.material.color = colorReleased;
+      GetComponent<Renderer>().material.color = colorReleased;
   }
 
   public override void OnStartHover() {
     base.OnStartHover();
 
     if (!connected_)
-      renderer.material.color = colorHover;
+      GetComponent<Renderer>().material.color = colorHover;
   }
 
   public override void OnStopHover() {
     base.OnStopHover();
 
     if (!connected_)
-      renderer.material.color = colorReleased;
+      GetComponent<Renderer>().material.color = colorReleased;
   }
 
   public void Connect() {
     connected_ = true;
-    renderer.material.color = colorGrabbed;
+    GetComponent<Renderer>().material.color = colorGrabbed;
   }
 
   public void Disconnect() {
     connected_ = false;
     if (!grabbed_)
-      renderer.material.color = colorReleased;
+      GetComponent<Renderer>().material.color = colorReleased;
   }
 }

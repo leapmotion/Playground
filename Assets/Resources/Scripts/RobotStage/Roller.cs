@@ -20,8 +20,8 @@ public class Roller : MonoBehaviour {
   public float recoveringDistance = -2.0f;
 
   void Start () {
-    rigidbody.maxAngularVelocity = maxAngularVelocity;
-    Physics.IgnoreCollision(collider, upright.collider, true);
+    GetComponent<Rigidbody>().maxAngularVelocity = maxAngularVelocity;
+    Physics.IgnoreCollision(GetComponent<Collider>(), upright.GetComponent<Collider>(), true);
   }
 
   public bool IsUpright() {
@@ -36,16 +36,16 @@ public class Roller : MonoBehaviour {
           upright.transform.up);
       force_quaternion.ToAngleAxis(out rotation_angle, out rotation_axis);
 
-      Vector3 velocity_diff = rigidbody.velocity - upright.rigidbody.velocity;
+      Vector3 velocity_diff = GetComponent<Rigidbody>().velocity - upright.GetComponent<Rigidbody>().velocity;
       Vector3 velocity_diff_rotation = Vector3.Cross(velocity_diff, Vector3.up);
-      Vector3 velocity_rotation = Vector3.Cross(rigidbody.velocity, Vector3.up);
+      Vector3 velocity_rotation = Vector3.Cross(GetComponent<Rigidbody>().velocity, Vector3.up);
 
       // This is pretty much hacked together. Change these but beware.
       Vector3 force =
           angleForceScale * Mathf.Tan(rotation_angle / 180.0f * Mathf.PI) * rotation_axis +
           angularVelocityForceScale * velocity_diff_rotation -
           velocityForceScale * velocity_rotation;
-      rigidbody.AddTorque(force * Time.deltaTime * 50);
+      GetComponent<Rigidbody>().AddTorque(force * Time.deltaTime * 50);
     }
   }
 }

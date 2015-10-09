@@ -35,7 +35,7 @@ public class DanceFloor : MonoBehaviour {
     texture_.wrapMode = TextureWrapMode.Clamp;
     texture_.SetPixels(pixels_);
     texture_.Apply();
-    renderer.material.mainTexture = texture_;
+    GetComponent<Renderer>().material.mainTexture = texture_;
   }
 
   void Update() {

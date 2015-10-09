@@ -23,7 +23,7 @@ public class NotifyFlower : MonoBehaviour {
 
   void OnCollisionEnter(Collision collision) {
     Rigidbody joint = GetComponent<GrabbableObject>().breakableJoint;
-    if (joint != null && joint.hingeJoint != null)
+    if (joint != null && joint.GetComponent<HingeJoint>() != null)
       OnFlowerRustle(collision.relativeVelocity.magnitude);
   }
 }

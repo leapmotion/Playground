@@ -86,22 +86,22 @@ public class AudioEvents : MonoBehaviour {
     float waited = new_time - last_splash_time_;
     if (waited >= minSplashWaitTime) {
       float volume = splashVolumePerUnitySpeed * (speed - minSplashSpeed);
-      audio.PlayOneShot(GetSplashSound(), volume);
+      GetComponent<AudioSource>().PlayOneShot(GetSplashSound(), volume);
       last_splash_time_ = new_time;
     }
   }
 
   void PlayBreakSound(bool isPedal) {
-    audio.PlayOneShot(GetBreakSound());
+    GetComponent<AudioSource>().PlayOneShot(GetBreakSound());
     if (isPedal)
-      audio.PlayOneShot(GetMusicSound(), musicPickLevel);
+      GetComponent<AudioSource>().PlayOneShot(GetMusicSound(), musicPickLevel);
   }
 
   void PlayRustleSound(float strength) {
     float new_time = Time.timeSinceLevelLoad;
     float waited = new_time - last_rustle_time_;
     if (waited >= minRustleWaitTime) {
-      audio.PlayOneShot(GetRustleSound(), rustleScale * strength);
+      GetComponent<AudioSource>().PlayOneShot(GetRustleSound(), rustleScale * strength);
       last_rustle_time_ = new_time;
     }
   }
@@ -110,7 +110,7 @@ public class AudioEvents : MonoBehaviour {
     float new_time = Time.timeSinceLevelLoad;
     float waited = new_time - last_fish_creation_time_;
     if (waited >= minFishCreationWaitTime) {
-      audio.PlayOneShot(GetFishCreationSound(), fishCreationLevel);
+      GetComponent<AudioSource>().PlayOneShot(GetFishCreationSound(), fishCreationLevel);
       last_fish_creation_time_ = new_time;
     }
   }

@@ -48,12 +48,12 @@ public class RobotDizzyHead : RobotHead {
       float x_torque = 0.48f - Mathf.PerlinNoise(perlin_noise_increment_, 0.0f);
       float z_torque = 0.47f - Mathf.PerlinNoise(perlin_noise_increment_, 100.0f);
       float torque_scale = Time.deltaTime * drunkednessScale;
-      robot_body_.feet.rigidbody.AddTorque(torque_scale * new Vector3(x_torque, 0, z_torque));
+      robot_body_.feet.GetComponent<Rigidbody>().AddTorque(torque_scale * new Vector3(x_torque, 0, z_torque));
       perlin_noise_increment_ += drunkednessJerkiness * Time.deltaTime;
 
       Vector3 direction = (center - transform.position).normalized;
       Vector3 torque = Time.deltaTime * forceTowardCenter * Vector3.Cross(direction, Vector3.up);
-      GetBody().feet.rigidbody.AddTorque(torque);
+      GetBody().feet.GetComponent<Rigidbody>().AddTorque(torque);
     }
   }
 }

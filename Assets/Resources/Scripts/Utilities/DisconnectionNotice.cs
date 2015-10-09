@@ -25,12 +25,12 @@ public class DisconnectionNotice : MonoBehaviour {
   }
 
   void SetAlpha(float alpha) {
-    guiTexture.color = Color.Lerp(Color.clear, onColor, alpha);
+    GetComponent<GUITexture>().color = Color.Lerp(Color.clear, onColor, alpha);
   }
 
   void Update() {
     if (embeddedReplacementImage != null && controller.IsEmbedded()) {
-      guiTexture.texture = embeddedReplacementImage;
+      GetComponent<GUITexture>().texture = embeddedReplacementImage;
     }
 
     if (controller.IsConnected())

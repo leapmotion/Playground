@@ -37,7 +37,7 @@ public class RobotBody : MonoBehaviour {
   private float fallen_time_ = 0.0f;
 
   void Start() {
-    rigidbody.maxAngularVelocity = 20;
+    GetComponent<Rigidbody>().maxAngularVelocity = 20;
   }
 
   void RemoveLine() {
@@ -120,7 +120,7 @@ public class RobotBody : MonoBehaviour {
     }
 
     FixedJoint head_joint = gameObject.AddComponent<FixedJoint>();
-    head_joint.connectedBody = new_head.rigidbody;
+    head_joint.connectedBody = new_head.GetComponent<Rigidbody>();
     head_joint.anchor = headCenterOffset;
     head_joint.autoConfigureConnectedAnchor = false;
     head_joint.connectedAnchor = Vector3.zero;
@@ -161,7 +161,7 @@ public class RobotBody : MonoBehaviour {
       RemoveLine();
       if (spring != null)
         Destroy(spring);
-      audio.Stop();
+      GetComponent<AudioSource>().Stop();
     }
     else {
       if (closest_head.GetComponent<RobotHead>() != robot_head_)
@@ -169,17 +169,17 @@ public class RobotBody : MonoBehaviour {
 
       if ((head_center_position - closest_head.transform.position).magnitude < attachRadius) {
         AttachHead(closest_head);
-        audio.Stop();
+        GetComponent<AudioSource>().Stop();
       }
       else {
         DisconnectHead();
         DrawLine(neck_position, closest_head.transform.position);
         if (spring == null) {
           spring = gameObject.AddComponent<SpringJoint>();
-          audio.Play();
+          GetComponent<AudioSource>().Play();
         }
 
-        spring.connectedBody = closest_head.rigidbody;
+        spring.connectedBody = closest_head.GetComponent<Rigidbody>();
         spring.anchor = headCenterOffset;
         float magnet_force = maxMagnetForce *
                              Mathf.Clamp((1 - closest_distance / headMagnetRadius), 0, 1);
@@ -222,7 +222,7 @@ public class RobotBody : MonoBehaviour {
     if (!is_upright_) {
       fallen_time_ += Time.deltaTime;
       if (upright_angle < upsideDownAngle && fallen_time_ > fallenWaitTime)
-        rigidbody.AddTorque(-uprightForce * upright_axis);
+        GetComponent<Rigidbody>().AddTorque(-uprightForce * upright_axis);
     }
     else
       fallen_time_ = 0.0f;

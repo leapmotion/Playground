@@ -84,7 +84,7 @@ public class SpawnDoor : MonoBehaviour {
   void Update() {
     if (spawn_time_ <= doorOpenTime) {
       if (door_state_ == DoorState.kClosed)
-        audio.PlayOneShot(openingSound);
+        GetComponent<AudioSource>().PlayOneShot(openingSound);
       door_state_ = DoorState.kOpening;
       SetDoorOpenness(openCurve.Evaluate(spawn_time_ / doorOpenTime));
     }
@@ -95,7 +95,7 @@ public class SpawnDoor : MonoBehaviour {
     }
     else if (spawn_time_ < spawnTime) {
       if (door_state_ == DoorState.kOpen)
-        audio.PlayOneShot(closingSound);
+        GetComponent<AudioSource>().PlayOneShot(closingSound);
       door_state_ = DoorState.kClosing;
 
       float t = (spawn_time_ + doorCloseTime - spawnTime) / doorCloseTime;

@@ -16,7 +16,7 @@ public class PlayMusicWhenHands : MonoBehaviour {
   private int current_hands_ = 0;
 
   void Start() {
-    audio.volume = 0.0f;
+    GetComponent<AudioSource>().volume = 0.0f;
   }
 
   void OnEnable() {

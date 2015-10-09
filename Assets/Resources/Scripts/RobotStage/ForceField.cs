@@ -37,7 +37,7 @@ public class ForceField : MonoBehaviour {
     int y = (int)(height * (local_position.y + 0.5f) + 1.0f);
 
     for (int channel = 0; channel < COLOR_CHANNELS; ++channel) {
-      float color_strength = strength * collision.collider.renderer.material.color[channel];
+      float color_strength = strength * collision.collider.GetComponent<Renderer>().material.color[channel];
       if (x >= 1 && x <= width && y >= 1 && y <= height) {
         positions_[channel, x, y] += color_strength;
         if (x > 1)
@@ -65,7 +65,7 @@ public class ForceField : MonoBehaviour {
     texture_.filterMode = FilterMode.Point;
     texture_.SetPixels(pixels_);
     texture_.Apply();
-    renderer.material.mainTexture = texture_;
+    GetComponent<Renderer>().material.mainTexture = texture_;
   }
 
   void FixedUpdate() {

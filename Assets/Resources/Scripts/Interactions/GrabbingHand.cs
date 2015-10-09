@@ -70,7 +70,7 @@ public class GrabbingHand : MonoBehaviour {
 
     for (int j = 0; j < close_things.Length; ++j) {
       Vector3 new_distance = pinch_position - close_things[j].transform.position;
-      if (close_things[j].rigidbody != null && new_distance.magnitude < distance.magnitude &&
+      if (close_things[j].GetComponent<Rigidbody>() != null && new_distance.magnitude < distance.magnitude &&
           !close_things[j].transform.IsChildOf(transform) &&
           close_things[j].tag != "NotGrabbable") {
         GrabbableObject grabbable = close_things[j].GetComponent<GrabbableObject>();
@@ -115,8 +115,8 @@ public class GrabbingHand : MonoBehaviour {
 
       GrabbableObject grabbable = active_object_.GetComponent<GrabbableObject>();
       if (grabbable == null || grabbable.rotateQuickly) {
-        last_max_angular_velocity_ = active_object_.rigidbody.maxAngularVelocity;
-        active_object_.rigidbody.maxAngularVelocity = Mathf.Infinity;
+        last_max_angular_velocity_ = active_object_.GetComponent<Rigidbody>().maxAngularVelocity;
+        active_object_.GetComponent<Rigidbody>().maxAngularVelocity = Mathf.Infinity;
       }
 
       if (grabbable != null) {
@@ -147,7 +147,7 @@ public class GrabbingHand : MonoBehaviour {
         grabbable.OnRelease();
 
       if (grabbable == null || grabbable.rotateQuickly)
-        active_object_.rigidbody.maxAngularVelocity = last_max_angular_velocity_;
+        active_object_.GetComponent<Rigidbody>().maxAngularVelocity = last_max_angular_velocity_;
 
       IgnoreCollisions(active_object_.gameObject, false);
 
@@ -211,7 +211,7 @@ public class GrabbingHand : MonoBehaviour {
     clamped_pinch.y = Mathf.Clamp(clamped_pinch.y, minMovement.y, maxMovement.y);
     clamped_pinch.z = Mathf.Clamp(clamped_pinch.z, minMovement.z, maxMovement.z);
     Vector3 velocity = (clamped_pinch - active_object_.transform.position) / Time.deltaTime;
-    active_object_.rigidbody.velocity = velocity;
+    active_object_.GetComponent<Rigidbody>().velocity = velocity;
 
     Quaternion delta_rotation = target_rotation *
                                 Quaternion.Inverse(active_object_.transform.rotation);
@@ -225,7 +225,7 @@ public class GrabbingHand : MonoBehaviour {
       axis = -axis;
     }
     if (angle != 0)
-      active_object_.rigidbody.angularVelocity = angle * axis;
+      active_object_.GetComponent<Rigidbody>().angularVelocity = angle * axis;
   }
 
   bool ObjectReleaseBreak(Vector3 pinch_position) {
@@ -245,8 +245,8 @@ public class GrabbingHand : MonoBehaviour {
     Vector3 delta_position = current_pinch_ - active_object_.transform.position;
 
     float force = 20 * gravity_amount / (0.04f + delta_position.magnitude * delta_position.magnitude);
-    active_object_.rigidbody.AddForce(delta_position.normalized * force);
-    active_object_.rigidbody.velocity *= 0.9f;
+    active_object_.GetComponent<Rigidbody>().AddForce(delta_position.normalized * force);
+    active_object_.GetComponent<Rigidbody>().velocity *= 0.9f;
 
     Quaternion delta_rotation = target_rotation *
                                 Quaternion.Inverse(active_object_.transform.rotation);
@@ -260,7 +260,7 @@ public class GrabbingHand : MonoBehaviour {
       axis = -axis;
     }
     if (angle != 0)
-      active_object_.rigidbody.angularVelocity = gravity_amount * angle * axis;
+      active_object_.GetComponent<Rigidbody>().angularVelocity = gravity_amount * angle * axis;
   }
 
   void FixedUpdate() {
